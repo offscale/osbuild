@@ -5,13 +5,13 @@ project(osbuild
         LANGUAGES C)
 set(HOMEPAGE_URL "https://github.com/offscale/osbuild")
 
-set(CMAKE_C_STANDARD 90)
-
 set(src src/main)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    set(CMAKE_C_STANDARD C11)
     list(APPEND src src/win_build_deps)
 else()
+    set(CMAKE_C_STANDARD 90)
     list(APPEND src src/posix)
 endif()
 

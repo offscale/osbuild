@@ -7,6 +7,7 @@
 #include <Windows.h>
 #include <tchar.h>
 #include <windef.h>
+#include <process.h>
 
 #include "build_deps.h"
 #include "errors.h"
