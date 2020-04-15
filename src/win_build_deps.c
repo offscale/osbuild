@@ -22,7 +22,7 @@ inline int install_build_dependencies(void) {
     if (exists("cl")) {
         return EXIT_SUCCESS;
     } else if (exists(PROGRAM)) {
-        return execute_bin(PROGRAM, "install visualstudio2019buildtools")
+        return execute_bin(PROGRAM, "install visualstudio2019buildtools");
     } else {
         fprintf(stderr, "Build Tools for Visual Studio 2019 are available https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019\n");
         return EXIT_FAILURE;
@@ -36,12 +36,6 @@ int execute_bin(const TCHAR *absolute_bin_path, const TCHAR *input) {
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
     ZeroMemory( &pi, sizeof(pi) );
-
-    if( argc != 2 )
-    {
-        printf("Usage: %s [cmdline]\n", argv[0]);
-        return;
-    }
 
     // Start the child process.
     bool ret = CreateProcess( TEXT(absolute_bin_path),
