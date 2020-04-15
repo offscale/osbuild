@@ -14,35 +14,35 @@
 #include "build_deps.h"
 #include "errors.h"
 
-int execute_bin(const TCHAR *, const TCHAR *);
-BOOL exists(const TCHAR *);
+int execute_bin(TCHAR *, TCHAR *);
+BOOL exists(TCHAR *);
 
 #define PROGRAM "C:\\ProgramData\\chocolatey\\bin\\choco.exe"
 
 inline int install_build_dependencies(void) {
     // Maybe check if chocolately is installed, and if it is, run `choco install visualstudio2019buildtools` in PS
     // Maybe rewrite https://chocolatey.org/install.ps1 in C?
-    if (exists("cl")) {
+    if (exists("cl"))
         return EXIT_SUCCESS;
-    } else if (exists(PROGRAM)) {
+    else if (exists(PROGRAM))
         return execute_bin(PROGRAM, "install visualstudio2019buildtools");
-    } else {
+    else {
         fprintf(stderr, "Build Tools for Visual Studio 2019 are available https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019\n");
         return EXIT_FAILURE;
     }
 }
 
-int execute_bin(const TCHAR *absolute_bin_path, const TCHAR *input) {
+int execute_bin(TCHAR *absolute_bin_path, TCHAR *input) {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
 
-    ZeroMemory( &si, sizeof(si) );
+    ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
-    ZeroMemory( &pi, sizeof(pi) );
+    ZeroMemory(&pi, sizeof(pi));
 
     // Start the child process.
-    bool ret = CreateProcess( TEXT(absolute_bin_path),
-        input,        // Command line
+    bool ret = CreateProcess(TEXT(absolute_bin_path),
+        input,          // Command line
         NULL,           // Process handle not inheritable
         NULL,           // Thread handle not inheritable
         FALSE,          // Set handle inheritance to FALSE
@@ -50,7 +50,7 @@ int execute_bin(const TCHAR *absolute_bin_path, const TCHAR *input) {
         NULL,           // Use parent's environment block
         NULL,           // Use parent's starting directory
         &si,            // Pointer to STARTUPINFO structure
-        &pi )           // Pointer to PROCESS_INFORMATION structure
+        &pi             // Pointer to PROCESS_INFORMATION structure
     );
 
     // Wait until child process exits.
@@ -67,7 +67,7 @@ int execute_bin(const TCHAR *absolute_bin_path, const TCHAR *input) {
     return EXIT_SUCCESS;
 }
 
-BOOL exists(const TCHAR *absolute_bin_path) {
+BOOL exists(TCHAR *absolute_bin_path) {
     // TODO: Check if path is accessible and executable
     return FALSE;
 }
