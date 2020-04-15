@@ -4,7 +4,7 @@ project(osbuild C)
 #set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD 90)
 
-set(src src/main.c src/posix.h)
+set(src src/main.c src/posix.h src/posix.c)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     list(APPEND src src/linux_build_deps)
