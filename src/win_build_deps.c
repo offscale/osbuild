@@ -6,12 +6,13 @@
 
 #include <Windows.h>
 #include <tchar.h>
+#include <windef.h>
 
 #include "build_deps.h"
 #include "errors.h"
 
 int execute_bin(const TCHAR *, const TCHAR *);
-VARIANT_BOOL exists(const TCHAR *);
+BOOL exists(const TCHAR *);
 
 #define PROGRAM "C:\\ProgramData\\chocolatey\\bin\\choco.exe"
 
@@ -43,7 +44,7 @@ int execute_bin(const TCHAR *absolute_bin_path, const TCHAR *input) {
     }
 
     // Start the child process.
-    const bool ret = CreateProcess( TEXT(absolute_bin_path),
+    bool ret = CreateProcess( TEXT(absolute_bin_path),
         input,        // Command line
         NULL,           // Process handle not inheritable
         NULL,           // Thread handle not inheritable
@@ -69,9 +70,9 @@ int execute_bin(const TCHAR *absolute_bin_path, const TCHAR *input) {
     return EXIT_SUCCESS;
 }
 
-VARIANT_BOOL exists(const TCHAR *absolute_bin_path) {
+BOOL exists(const TCHAR *absolute_bin_path) {
     // TODO: Check if path is accessible and executable
-    return VARIANT_FALSE;
+    return FALSE;
 }
 
 #endif
