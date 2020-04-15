@@ -7,9 +7,12 @@
 #include <Shlwapi.h>
 
 #include "build_deps.h"
+#include "errors.h"
 
 int install_build_dependencies(void) {
-    puts("Windows\n");
+    // Maybe check if chocolately is installed, and if it is, run `choco install visualstudio2019buildtools` in PS
+    // Maybe rewrite https://chocolatey.org/install.ps1 in C?
+    puts("Build Tools for Visual Studio 2019 are available https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019\n");
     return UNIMPLEMENTED;
 }
 

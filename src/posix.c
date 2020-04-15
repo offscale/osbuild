@@ -1,4 +1,5 @@
 #include "posix.h"
+#include "errors.h"
 
 int execute_bin(const char *const *const args) {
     int status;

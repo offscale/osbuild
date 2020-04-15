@@ -12,8 +12,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#include "build_deps.h"
-
 static int exists(const char *);
 int execute_bin(const char *const *const);
 
