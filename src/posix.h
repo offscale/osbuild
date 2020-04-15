@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-static int exists(const char *);
+int exists(const char *);
 int execute_bin(const char *const *const);
 
 #endif

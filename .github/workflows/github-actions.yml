@@ -21,3 +21,13 @@ jobs:
           mkdir cmake-build-"$GITHUB_ACTION"-debug && cd "$_"
           cmake -DCMAKE_BUILD_TYPE=Debug ..
           cmake --build .
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: |
+          md cmake-build-debug
+          cd cmake-build-debug
+          cmake -DCMAKE_BUILD_TYPE=Debug ..
+          cmake --build .

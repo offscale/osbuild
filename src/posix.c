@@ -31,10 +31,10 @@ int execute_bin(const char *const *const args) {
 }
 
 // Edited from https://svnweb.freebsd.org/base/stable/12/usr.bin/which/which.c?revision=339434&view=markup&pathrev=339434#l105
-static int exists(const char *candidate) {
+int exists(const char *candidate) {
     struct stat fin;
 
-    /* XXX work around access(2) false positives for superuser */
+    // XXX work around access(2) false positives for superuser
     if (access(candidate, X_OK) == 0 &&
         stat(candidate, &fin) == 0 &&
         S_ISREG(fin.st_mode) &&

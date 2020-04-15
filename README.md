@@ -1,18 +1,19 @@
 osbuild
 =======
 [![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![CI](https://github.com/offscale/osbuild/workflows/CI/badge.svg)](https://github.com/offscale/osbuild/actions)
 
 Installs compiler and build tools for your platform. E.g., on Ubuntu it will run equivalent to `apt-get install -y build-essential.`
 
 Supports:
 
-  - Linux
+  - [ ] Linux
     - [x] Debian (and distros based upon, e.g., Ubuntu)
   - [ ] macOS
   - [ ] Windows
   - [ ] Solaris
   - [ ] illumos
-  - BSD
+  - [ ] BSD
     - [ ] FreeBSD (and distros based upon, e.g., DragonflyBSD)
     - [ ] OpenBSD
 

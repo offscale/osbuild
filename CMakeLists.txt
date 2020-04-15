@@ -7,7 +7,7 @@ set(HOMEPAGE_URL "https://github.com/offscale/osbuild")
 
 set(CMAKE_C_STANDARD 90)
 
-set(src src/main.c src/posix.c src/errors.h)
+set(src src/main src/posix src/errors src/build_deps)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     list(APPEND src src/linux_build_deps)
