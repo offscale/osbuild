@@ -3,10 +3,6 @@
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 
-#if defined (__APPLE__) && defined (__MACH__)
-#define ENOPKG 65
-#endif
-
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>

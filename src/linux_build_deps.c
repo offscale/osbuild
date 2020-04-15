@@ -10,7 +10,7 @@
 // static const char const* const program = "/usr/bin/apt-get";
 #define PROGRAM "/usr/bin/apt-get"
 
-int install_build_dependencies(void) {
+inline int install_build_dependencies(void) {
     static const char const*const args0[3] = {PROGRAM, "update", NULL};
     const int ret = execute_bin(args0);
     if (ret != 0) return ret;

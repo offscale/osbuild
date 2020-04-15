@@ -6,16 +6,18 @@ jobs:
   build_ubuntu:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: build
         run: |
           mkdir cmake-build-"$GITHUB_ACTION"-debug && cd "$_"
           cmake -DCMAKE_BUILD_TYPE=Debug ..
           cmake --build .
-  build_macos:  macos-latest
-        - uses: actions/checkout@v1
-        - name: build
-          run: |
-            mkdir cmake-build-"$GITHUB_ACTION"-debug && cd "$_"
-            cmake -DCMAKE_BUILD_TYPE=Debug ..
-            cmake --build .
+  build_macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: |
+          mkdir cmake-build-"$GITHUB_ACTION"-debug && cd "$_"
+          cmake -DCMAKE_BUILD_TYPE=Debug ..
+          cmake --build .

@@ -1,6 +1,10 @@
 #include "posix.h"
 #include "errors.h"
 
+#if defined (__APPLE__) && defined (__MACH__)
+#define ENOPKG 65
+#endif
+
 int execute_bin(const char *const *const args) {
     int status;
     extern char **environ;

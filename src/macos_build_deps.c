@@ -9,7 +9,7 @@
 #include "build_deps.h"
 
 
-int install_build_dependencies(void) {
+inline int install_build_dependencies(void) {
     // Maybe rewrite https://github.com/Homebrew/install/blob/master/install.sh in C?
     if (exists("gcc")) return EXIT_SUCCESS;
     puts("macOS requires https://developer.apple.com/xcode and its developer tools to be installed manually.");
