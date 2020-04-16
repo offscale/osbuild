@@ -3,4 +3,4 @@ freebsd_instance:
 
 task:
   install_script: pkg install -y cmake
-  script: mkdir cmake-build-debug && cd "$_" && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build .
+  script: env && cd $CIRRUS_WORKING_DIR && mkdir cmake-build-debug && cd "$_" && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build .
