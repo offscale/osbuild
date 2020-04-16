@@ -2,5 +2,5 @@ freebsd_instance:
   image_family: freebsd-12-1
 
 task:
-  install_script: pkg install -y cmake
-  script: env && cd $CIRRUS_WORKING_DIR && mkdir cmake-build-debug && cd "$_" && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build .
+  install_script: pkg install -y cmake tree
+  script: tree / && env && cd $CIRRUS_WORKING_DIR && ls -lR && mkdir cmake-build-debug && cd "$_" && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build .
