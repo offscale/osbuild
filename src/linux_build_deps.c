@@ -1,6 +1,6 @@
 #ifndef OSBUILD_LINUX_BUILD_DEPS_H
 #define OSBUILD_LINUX_BUILD_DEPS_H
-#if defined(__linux__)
+#ifdef __linux__
 
 #include <stddef.h>
 

@@ -17,6 +17,8 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     list(APPEND src src/linux_build_deps)
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+    list(APPEND src src/freebsd_build_deps)
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
     list(APPEND src src/macos_build_deps)
 endif()
