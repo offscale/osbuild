@@ -11,7 +11,7 @@
 #define PROGRAM "/usr/bin/apt-get"
 
 inline int install_build_dependencies(void) {
-    static const char const*const args0[3] = {PROGRAM, "update", NULL};
+    static const char const*const args0[4] = {PROGRAM, "update", "-q", NULL};
     const int ret = execute_bin(args0);
     if (ret != 0) return ret;
 

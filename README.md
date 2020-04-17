@@ -18,6 +18,13 @@ Supports:
     - [x] FreeBSD (and distros based upon, e.g., DragonflyBSD)
     - [ ] OpenBSD
 
+## Docker
+
+`Dockerfile`s are provided for convenience, try them out, e.g., by running:
+
+    docker build . -f Dockerfile.ubuntu --tag osbuild
+    docker run osbuild
+
 ---
 
 ## License
