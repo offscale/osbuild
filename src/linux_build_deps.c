@@ -35,7 +35,7 @@ inline int install_build_dependencies(const char* distribution) {
         return ENOENT;
     }
      */
-    if (strcmp(distribution, "ubuntu") == 0 || strcmp(distribution, "debian") == 0)
+    if (strcmp(distribution, "debian") == 0)
         return deb_install_build_dependencies();
     else {
         fprintf(stderr, "Unsupported Linux distribution: %s", distribution);
