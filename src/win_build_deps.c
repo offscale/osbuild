@@ -75,4 +75,3 @@ BOOL exists(TCHAR *absolute_bin_path) {
 
 #endif
 #endif
-#endif

@@ -6,7 +6,7 @@
 #include <sys/param.h>
 #endif
 
-#ifdef __FREEBSD__
+#ifdef __FreeBSD__
 
 #include <stddef.h>
 

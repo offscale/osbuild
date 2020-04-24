@@ -13,7 +13,7 @@
 inline const char* get_distribution(void) {
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     return "Windows";
-#elif defined(__FREEBSD__)
+#elif defined(__FreeBSD__)
     return "FreeBSD";
 #elif defined (__APPLE__) && defined (__MACH__)
     return "macOS";
