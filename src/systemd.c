@@ -1,3 +1,5 @@
+#ifdef __linux__
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -116,3 +118,5 @@ const char* dist_from_os_release(void) {
     }
     return "";
 }
+
+#endif

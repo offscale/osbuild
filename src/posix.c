@@ -1,7 +1,7 @@
 #include "posix.h"
 #include "errors.h"
 
-#if defined (__APPLE__) && defined (__MACH__)
+#if defined(__FREEBSD__) ||  defined (__APPLE__) && defined (__MACH__)
 #define ENOPKG 65
 #endif
 
