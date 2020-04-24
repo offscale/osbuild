@@ -1,7 +1,8 @@
 #ifndef OSBUILD_FREEBSD_BUILD_DEPS_H
 #define OSBUILD_FREEBSD_BUILD_DEPS_H
 
-#if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_MSC_VER)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#else
 #include <sys/param.h>
 #endif
 
