@@ -3,6 +3,7 @@
 #if defined(__APPLE__) && defined(__MACH__)
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "posix.h"
 #include "build_deps.h"

@@ -1,11 +1,12 @@
-#include "posix.h"
-#include "errors.h"
-
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+
 #else
+
 #include <sys/param.h>
 #include <errno.h>
-#endif
+
+#include "posix.h"
+#include "errors.h"
 
 #if defined(__FREEBSD__) ||  defined (__APPLE__) && defined (__MACH__)
 #define ENOPKG 65
@@ -50,3 +51,5 @@ int exists(const char *candidate) {
     }
     return 0;
 }
+
+#endif

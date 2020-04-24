@@ -19,7 +19,6 @@ message("-- CMAKE_SYSTEM:           ${CMAKE_SYSTEM}")
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     list(APPEND src src/systemd src/linux_build_deps)
-
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
     list(APPEND src src/freebsd_build_deps)
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
