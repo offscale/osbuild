@@ -1,7 +1,26 @@
 #ifndef OSBUILD_LINUX_VERSION_H
 #define OSBUILD_LINUX_VERSION_H
 
+#ifndef SVN_NULL_DEVICE_NAME
+#ifdef WIN32
+/* Name of system's null device */
+#define SVN_NULL_DEVICE_NAME "nul"
+#else
+/* Name of system's null device */
+#define SVN_NULL_DEVICE_NAME "/dev/null"
+#endif
+#endif
+
 #if __linux__
+#include <stdio.h>
+#include <sys/utsname.h>
+
+#include <svn_types.h>
+#include <svn_utf.h>
+#include <apr_strings.h>
+#include <svn_io.h>
+#include <svn_error.h>
+
 /* Split a stringbuf into a key/value pair.
    Return the key, leaving the stripped value in the stringbuf. */
 static const char *
@@ -303,9 +322,47 @@ debian_release(apr_pool_t *pool)
   return apr_pstrcat(pool, "Debian ", buffer->data, SVN_VA_NULL);
 }
 
+/* Generate a release name from the uname(3) info, effectively
+   returning "`uname -s` `uname -r`". */
+static const char *
+release_name_from_uname(apr_pool_t *pool)
+{
+    struct utsname info;
+    if (0 <= uname(&info))
+    {
+        svn_error_t *err;
+        const char *sysname;
+        const char *sysver;
+
+        err = svn_utf_cstring_to_utf8(&sysname, info.sysname, pool);
+        if (err)
+        {
+            sysname = NULL;
+            svn_error_clear(err);
+        }
+
+
+        err = svn_utf_cstring_to_utf8(&sysver, info.release, pool);
+        if (err)
+        {
+            sysver = NULL;
+            svn_error_clear(err);
+        }
+
+        if (sysname || sysver)
+        {
+            return apr_psprintf(pool, "%s%s%s",
+                                (sysname ? sysname : ""),
+                                (sysver ? (sysname ? " " : "") : ""),
+                                (sysver ? sysver : ""));
+        }
+    }
+    return NULL;
+}
+
 /* Try to find the Linux distribution name, or return info from uname. */
 static const char *
-linux_release_name(apr_pool_t *pool)
+    linux_release_name(apr_pool_t *pool)
 {
   const char *uname_release = release_name_from_uname(pool);
 
@@ -332,7 +389,7 @@ linux_release_name(apr_pool_t *pool)
   if (!release_name)
     return uname_release;
 
-  if (!uname_release)
+  else if (!uname_release)
     return release_name;
 
   return apr_psprintf(pool, "%s [%s]", release_name, uname_release);

@@ -5,7 +5,25 @@ project(osbuild
         LANGUAGES C)
 set(HOMEPAGE_URL "https://github.com/offscale/osbuild")
 
-set(src src/main src/linux_version.h)
+add_compile_definitions(SVN_ERR__TRACING)
+#include_directories(/usr/local/apr/lib)
+include_directories(/usr/local/apr/include/apr-2)
+#include_directories(/Volumes/WD/repos/apr/include)
+include_directories(src/sys)
+include_directories(src/sys/private)
+
+find_library(APR_LIBRARY apr-1 PATHS /usr/local/apr/lib/)
+
+set(src src/main
+        src/sys/sysinfo.h
+        src/sys/svn_error.h
+        src/sys/svn_io.h
+        src/sys/svn_string.h
+        src/sys/ctype.c
+        src/sys/svn_ctype.h
+        src/sys/string.c
+        src/linux_version.h
+        src/version.h)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(CMAKE_C_STANDARD C11)
@@ -17,9 +35,9 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     list(APPEND src src/linux_build_deps)
-    message("-- CMAKE_SYSTEM_INFO_FILE: ${CMAKE_SYSTEM_INFO_FILE}")
-    message("-- CMAKE_SYSTEM_NAME:      ${CMAKE_SYSTEM_NAME}")
-    message("-- CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
+    #message("-- CMAKE_SYSTEM_INFO_FILE: ${CMAKE_SYSTEM_INFO_FILE)
+    #message("-- CMAKE_SYSTEM_NAME:      ${CMAKE_SYSTEM_NAME}")
+    #message("-- CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCES#SOR}")
     message("-- CMAKE_SYSTEM:           ${CMAKE_SYSTEM}")
 
     string (REGEX MATCH "\\.el[1-9]" os_version_suffix ${CMAKE_SYSTEM})
@@ -31,3 +49,5 @@ elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 endif()
 
 add_executable(osbuild ${src})
+
+target_link_libraries(osbuild ${APR_LIBRARY})

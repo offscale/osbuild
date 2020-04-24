@@ -25,6 +25,15 @@ Supports:
     docker build . -f Dockerfile.ubuntu --tag osbuild
     docker run osbuild
 
+## Dependencies
+
+apr headers, install with:
+
+
+### Ubuntu
+
+    sudo apt-get install libapr1-dev
+
 ---
 
 ## License

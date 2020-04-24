@@ -51,8 +51,20 @@
 #include "sysinfo.h"
 #include "svn_private_config.h"
 
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
 #if HAVE_SYS_UTSNAME_H
 #include <sys/utsname.h>
+#endif
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#if HAVE_ELF_H
+#include <elf.h>
 #endif
 
 #ifdef SVN_HAVE_MACOS_PLIST
@@ -92,6 +104,7 @@ static const apr_array_header_t *macos_shared_libs(apr_pool_t *pool);
 
 #if __linux__
 static const char *linux_release_name(apr_pool_t *pool);
+static const apr_array_header_t *linux_shared_libs(apr_pool_t *pool);
 #endif
 
 const char *
@@ -127,7 +140,8 @@ const apr_array_header_t *
 svn_sysinfo__linked_libs(apr_pool_t *pool)
 {
   svn_version_ext_linked_lib_t *lib;
-  apr_array_header_t *array = apr_array_make(pool, 6, sizeof(*lib));
+  apr_array_header_t *array = apr_array_make(pool, 7, sizeof(*lib));
+  int lz4_version = svn_lz4__runtime_version();
 
   lib = &APR_ARRAY_PUSH(array, svn_version_ext_linked_lib_t);
   lib->name = "APR";
@@ -167,6 +181,15 @@ svn_sysinfo__linked_libs(apr_pool_t *pool)
   lib->compiled_version = apr_pstrdup(pool, svn_zlib__compiled_version());
   lib->runtime_version = apr_pstrdup(pool, svn_zlib__runtime_version());
 
+  lib = &APR_ARRAY_PUSH(array, svn_version_ext_linked_lib_t);
+  lib->name = "LZ4";
+  lib->compiled_version = apr_pstrdup(pool, svn_lz4__compiled_version());
+
+  lib->runtime_version = apr_psprintf(pool, "%d.%d.%d",
+                                      lz4_version / 100 / 100,
+                                      (lz4_version / 100) % 100,
+                                      lz4_version % 100);
+
   return array;
 }
 
@@ -177,6 +200,8 @@ svn_sysinfo__loaded_libs(apr_pool_t *pool)
   return win32_shared_libs(pool);
 #elif defined(SVN_HAVE_MACHO_ITERATE)
   return macos_shared_libs(pool);
+#elif __linux__
+  return linux_shared_libs(pool);
 #else
   return NULL;
 #endif
@@ -289,7 +314,530 @@ release_name_from_uname(apr_pool_t *pool)
 #endif  /* HAVE_UNAME */
 
 
+#if __linux__
+/* Find the first whitespace character in a stringbuf.
+   Analogous to svn_stringbuf_first_non_whitespace. */
+static apr_size_t
+stringbuf_first_whitespace(const svn_stringbuf_t *str)
+{
+  apr_size_t i;
+  for (i = 0; i < str->len; ++i)
+    {
+      if (svn_ctype_isspace(str->data[i]))
+        return i;
+    }
+  return str->len;
+}
 
+/* Skip a whitespace-delimited field in a stringbuf. */
+static void
+stringbuf_skip_whitespace_field(svn_stringbuf_t *str)
+{
+  apr_size_t i;
+  i = stringbuf_first_whitespace(str);
+  svn_stringbuf_leftchop(str, i);
+  i = svn_stringbuf_first_non_whitespace(str);
+  svn_stringbuf_leftchop(str, i);
+}
+
+/* Split a stringbuf into a key/value pair.
+   Return the key, leaving the stripped value in the stringbuf. */
+static const char *
+stringbuf_split_key(svn_stringbuf_t *buffer, char delim)
+{
+  char *key;
+  char *end;
+
+  end = strchr(buffer->data, delim);
+  if (!end)
+    return NULL;
+
+  svn_stringbuf_strip_whitespace(buffer);
+
+  /* Now we split the currently allocated buffer in two parts:
+      - a const char * HEAD
+      - the remaining stringbuf_t. */
+
+  /* Create HEAD as '\0' terminated const char * */
+  key = buffer->data;
+  end = strchr(key, delim);
+  *end = '\0';
+
+  /* And update the TAIL to be a smaller, but still valid stringbuf */
+  buffer->data = end + 1;
+  buffer->len -= 1 + end - key;
+  buffer->blocksize -= 1 + end - key;
+
+  svn_stringbuf_strip_whitespace(buffer);
+
+  return key;
+}
+
+/* Parse `/usr/bin/lsb_rlease --all` */
+static const char *
+lsb_release(apr_pool_t *pool)
+{
+  static const char *const args[3] =
+    {
+      "/usr/bin/lsb_release",
+      "--all",
+      NULL
+    };
+
+  const char *distributor = NULL;
+  const char *description = NULL;
+  const char *release = NULL;
+  const char *codename = NULL;
+
+  apr_proc_t lsbproc;
+  svn_stream_t *lsbinfo;
+  svn_error_t *err;
+
+  /* Run /usr/bin/lsb_release --all < /dev/null 2>/dev/null */
+  {
+    apr_file_t *stdin_handle;
+    apr_file_t *stdout_handle;
+
+    err = svn_io_file_open(&stdin_handle, SVN_NULL_DEVICE_NAME,
+                           APR_READ, APR_OS_DEFAULT, pool);
+    if (!err)
+      err = svn_io_file_open(&stdout_handle, SVN_NULL_DEVICE_NAME,
+                             APR_WRITE, APR_OS_DEFAULT, pool);
+    if (!err)
+      err = svn_io_start_cmd3(&lsbproc, NULL, args[0], args, NULL, FALSE,
+                              FALSE, stdin_handle,
+                              TRUE, NULL,
+                              FALSE, stdout_handle,
+                              pool);
+    if (err)
+      {
+        svn_error_clear(err);
+        return NULL;
+      }
+  }
+
+  /* Parse the output and try to populate the  */
+  lsbinfo = svn_stream_from_aprfile2(lsbproc.out, TRUE, pool);
+  if (lsbinfo)
+    {
+      for (;;)
+        {
+          svn_boolean_t eof = FALSE;
+          svn_stringbuf_t *line;
+          const char *key;
+
+          err = svn_stream_readline(lsbinfo, &line, "\n", &eof, pool);
+          if (err || eof)
+            break;
+
+          key = stringbuf_split_key(line, ':');
+          if (!key)
+            continue;
+
+          if (0 == svn_cstring_casecmp(key, "Distributor ID"))
+            distributor = line->data;
+          else if (0 == svn_cstring_casecmp(key, "Description"))
+            description = line->data;
+          else if (0 == svn_cstring_casecmp(key, "Release"))
+            release = line->data;
+          else if (0 == svn_cstring_casecmp(key, "Codename"))
+            codename = line->data;
+        }
+      err = svn_error_compose_create(err,
+                                     svn_stream_close(lsbinfo));
+      if (err)
+        {
+          svn_error_clear(err);
+          apr_proc_kill(&lsbproc, SIGKILL);
+          return NULL;
+        }
+    }
+
+  /* Reap the child process */
+  err = svn_io_wait_for_cmd(&lsbproc, "", NULL, NULL, pool);
+  if (err)
+    {
+      svn_error_clear(err);
+      return NULL;
+    }
+
+  if (description)
+    return apr_psprintf(pool, "%s%s%s%s", description,
+                        (codename ? " (" : ""),
+                        (codename ? codename : ""),
+                        (codename ? ")" : ""));
+  if (distributor)
+    return apr_psprintf(pool, "%s%s%s%s%s%s", distributor,
+                        (release ? " " : ""),
+                        (release ? release : ""),
+                        (codename ? " (" : ""),
+                        (codename ? codename : ""),
+                        (codename ? ")" : ""));
+
+  return NULL;
+}
+
+/* Read /etc/os-release, as documented here:
+ * http://www.freedesktop.org/software/systemd/man/os-release.html
+ */
+static const char *
+systemd_release(apr_pool_t *pool)
+{
+  svn_error_t *err;
+  svn_stream_t *stream;
+
+  /* Open the file. */
+  err = svn_stream_open_readonly(&stream, "/etc/os-release", pool, pool);
+  if (err && APR_STATUS_IS_ENOENT(err->apr_err))
+    {
+      svn_error_clear(err);
+      err = svn_stream_open_readonly(&stream, "/usr/lib/os-release", pool,
+                                     pool);
+    }
+  if (err)
+    {
+      svn_error_clear(err);
+      return NULL;
+    }
+
+  /* Look for the PRETTY_NAME line. */
+  while (TRUE)
+    {
+      svn_stringbuf_t *line;
+      svn_boolean_t eof;
+
+      err = svn_stream_readline(stream, &line, "\n", &eof, pool);
+      if (err)
+        {
+          svn_error_clear(err);
+          return NULL;
+        }
+
+      if (!strncmp(line->data, "PRETTY_NAME=", 12))
+        {
+          svn_stringbuf_t *release_name;
+
+          /* The value may or may not be enclosed by double quotes.  We don't
+           * attempt to strip them. */
+          release_name = svn_stringbuf_create(line->data + 12, pool);
+          svn_error_clear(svn_stream_close(stream));
+          svn_stringbuf_strip_whitespace(release_name);
+          return release_name->data;
+        }
+
+      if (eof)
+        break;
+    }
+
+  /* The file did not contain a PRETTY_NAME line. */
+  svn_error_clear(svn_stream_close(stream));
+  return NULL;
+}
+
+/* Read the whole contents of a file. */
+static svn_stringbuf_t *
+read_file_contents(const char *filename, apr_pool_t *pool)
+{
+  svn_error_t *err;
+  svn_stringbuf_t *buffer;
+
+  err = svn_stringbuf_from_file2(&buffer, filename, pool);
+  if (err)
+    {
+      svn_error_clear(err);
+      return NULL;
+    }
+
+  return buffer;
+}
+
+/* Strip everything but the first line from a stringbuf. */
+static void
+stringbuf_first_line_only(svn_stringbuf_t *buffer)
+{
+  char *eol = strchr(buffer->data, '\n');
+  if (eol)
+    {
+      *eol = '\0';
+      buffer->len = 1 + eol - buffer->data;
+    }
+  svn_stringbuf_strip_whitespace(buffer);
+}
+
+/* Look at /etc/redhat_release to detect RHEL/Fedora/CentOS. */
+static const char *
+redhat_release(apr_pool_t *pool)
+{
+  svn_stringbuf_t *buffer = read_file_contents("/etc/redhat-release", pool);
+  if (buffer)
+    {
+      stringbuf_first_line_only(buffer);
+      return buffer->data;
+    }
+  return NULL;
+}
+
+/* Look at /etc/SuSE-release to detect non-LSB SuSE. */
+static const char *
+suse_release(apr_pool_t *pool)
+{
+  const char *release = NULL;
+  const char *codename = NULL;
+
+  svn_stringbuf_t *buffer = read_file_contents("/etc/SuSE-release", pool);
+  svn_stringbuf_t *line;
+  svn_stream_t *stream;
+  svn_boolean_t eof;
+  svn_error_t *err;
+  if (!buffer)
+      return NULL;
+
+  stream = svn_stream_from_stringbuf(buffer, pool);
+  err = svn_stream_readline(stream, &line, "\n", &eof, pool);
+  if (err || eof)
+    {
+      svn_error_clear(err);
+      return NULL;
+    }
+
+  svn_stringbuf_strip_whitespace(line);
+  release = line->data;
+
+  for (;;)
+    {
+      const char *key;
+
+      err = svn_stream_readline(stream, &line, "\n", &eof, pool);
+      if (err || eof)
+        {
+          svn_error_clear(err);
+          break;
+        }
+
+      key = stringbuf_split_key(line, '=');
+      if (!key)
+        continue;
+
+      if (0 == strncmp(key, "CODENAME", 8))
+        codename = line->data;
+    }
+
+  return apr_psprintf(pool, "%s%s%s%s",
+                      release,
+                      (codename ? " (" : ""),
+                      (codename ? codename : ""),
+                      (codename ? ")" : ""));
+}
+
+/* Look at /etc/debian_version to detect non-LSB Debian. */
+static const char *
+debian_release(apr_pool_t *pool)
+{
+  svn_stringbuf_t *buffer = read_file_contents("/etc/debian_version", pool);
+  if (!buffer)
+      return NULL;
+
+  stringbuf_first_line_only(buffer);
+  return apr_pstrcat(pool, "Debian ", buffer->data, SVN_VA_NULL);
+}
+
+/* Try to find the Linux distribution name, or return info from uname. */
+static const char *
+linux_release_name(apr_pool_t *pool)
+{
+  const char *uname_release = release_name_from_uname(pool);
+
+  /* Try anything that has /usr/bin/lsb_release.
+     Covers, for example, Debian, Ubuntu and SuSE.  */
+  const char *release_name = lsb_release(pool);
+
+  /* Try the systemd way (covers Arch). */
+  if (!release_name)
+    release_name = systemd_release(pool);
+
+  /* Try RHEL/Fedora/CentOS */
+  if (!release_name)
+    release_name = redhat_release(pool);
+
+  /* Try Non-LSB SuSE */
+  if (!release_name)
+    release_name = suse_release(pool);
+
+  /* Try non-LSB Debian */
+  if (!release_name)
+    release_name = debian_release(pool);
+
+  if (!release_name)
+    return uname_release;
+
+  if (!uname_release)
+    return release_name;
+
+  return apr_psprintf(pool, "%s [%s]", release_name, uname_release);
+}
+
+#if HAVE_ELF_H
+/* Parse a hexadecimal number as a pointer value. */
+static const unsigned char *
+parse_pointer_value(const char *start, const char *limit, char **end)
+{
+  const unsigned char *ptr;
+  const apr_uint64_t val = (apr_uint64_t)apr_strtoi64(start, end, 16);
+
+  if (errno                     /* overflow */
+      || *end == start          /* no valid digits */
+      || *end >= limit)         /* representation too long */
+    return NULL;
+
+  ptr = (const unsigned char*)val;
+  if (val != (apr_uint64_t)ptr)  /* truncated value */
+    return NULL;
+
+  return ptr;
+}
+
+/* Read the ELF header at the mapping position to check if this is a shared
+   library. We only look at the ELF identification and the type. The format is
+   described here:
+       http://www.skyfree.org/linux/references/ELF_Format.pdf
+*/
+static svn_boolean_t
+check_elf_header(const unsigned char *map_start,
+                 const unsigned char *map_end)
+{
+  /* A union of all known ELF header types, for size checks. */
+  union max_elf_header_size_t
+  {
+    Elf32_Ehdr header_32;
+    Elf64_Ehdr header_64;
+  };
+
+  /* Check the size of the mapping and the ELF magic tag. */
+  if (map_end < map_start
+      || map_end - map_start < sizeof(union max_elf_header_size_t)
+      || memcmp(map_start, ELFMAG, SELFMAG))
+    {
+      return FALSE;
+    }
+
+  /* Check that this is an ELF shared library or executable file. This also
+     implicitly checks that the data encoding of the current process is the
+     same as in the loaded library. */
+  if (map_start[EI_CLASS] == ELFCLASS32)
+    {
+      const Elf32_Ehdr *hdr = (void*)map_start;
+      return (hdr->e_type == ET_DYN || hdr->e_type == ET_EXEC);
+    }
+  else if (map_start[EI_CLASS] == ELFCLASS64)
+    {
+      const Elf64_Ehdr *hdr = (void*)map_start;
+      return (hdr->e_type == ET_DYN || hdr->e_type == ET_EXEC);
+    }
+
+  return FALSE;
+}
+#endif  /* HAVE_ELF_H */
+
+static const apr_array_header_t *
+linux_shared_libs(apr_pool_t *pool)
+{
+  /* Read the list of loaded modules from /proc/[pid]/maps
+    The format is described here:
+        http://man7.org/linux/man-pages/man5/proc.5.html
+  */
+
+  const char *maps = apr_psprintf(pool, "/proc/%ld/maps", (long)getpid());
+  apr_array_header_t *result = NULL;
+  svn_boolean_t eof = FALSE;
+  svn_stream_t *stream;
+  svn_error_t *err;
+
+  err = svn_stream_open_readonly(&stream, maps, pool, pool);
+  if (err)
+    {
+      svn_error_clear(err);
+      return NULL;
+    }
+
+  /* Each line in /proc/[pid]/maps consists of whitespace-delimited fields. */
+  while (!eof)
+    {
+      svn_stringbuf_t *line;
+
+#if HAVE_ELF_H
+      const unsigned char *map_start;
+      const unsigned char *map_end;
+#endif
+
+      err = svn_stream_readline(stream, &line, "\n", &eof, pool);
+      if (err)
+        {
+          svn_error_clear(err);
+          return NULL;
+        }
+
+#if HAVE_ELF_H
+      /* Address: The mapped memory address range. */
+      {
+        const char *const limit = line->data + line->len;
+        char *end;
+
+        /* The start of the address range */
+        map_start = parse_pointer_value(line->data, limit, &end);
+        if (!map_start || *end != '-')
+          continue;
+
+        /* The end of the address range */
+        map_end = parse_pointer_value(end + 1, limit, &end);
+        if (!map_end || !svn_ctype_isspace(*end))
+          continue;
+      }
+#endif
+
+      stringbuf_skip_whitespace_field(line); /* skip address */
+
+      /* Permissions: The memory region must be readable and executable. */
+      if (line->len < 4 || line->data[0] != 'r' || line->data[2] != 'x')
+        continue;
+
+      stringbuf_skip_whitespace_field(line); /* skip perms */
+      stringbuf_skip_whitespace_field(line); /* skip offset */
+      stringbuf_skip_whitespace_field(line); /* skip device */
+
+      /* I-Node: If it is 0, there is no file associated with the region. */
+      if (line->len < 2
+          || (line->data[0] == '0' && svn_ctype_isspace(line->data[1])))
+        continue;
+
+      stringbuf_skip_whitespace_field(line); /* skip inode */
+
+      /* Consider only things that look like absolute paths.
+         Files that were removed since the process was created (due to an
+         upgrade, for example) are marked as '(deleted)'. */
+      if (line->data[0] == '/')
+        {
+          svn_version_ext_loaded_lib_t *lib;
+
+#if HAVE_ELF_H
+          if (!check_elf_header(map_start, map_end))
+            continue;
+#endif
+
+          /* We've done our best to find a mapped shared library. */
+          if (!result)
+            {
+              result = apr_array_make(pool, 32, sizeof(*lib));
+            }
+          lib = &APR_ARRAY_PUSH(result, svn_version_ext_loaded_lib_t);
+          lib->name = line->data;
+          lib->version = NULL;
+        }
+    }
+
+  svn_error_clear(svn_stream_close(stream));
+  return result;
+}
+#endif /* __linux__ */
 
 
 #ifdef WIN32
@@ -330,7 +878,7 @@ system_info(SYSTEM_INFO *sysinfo,
             SYSTEM_INFO *local_sysinfo)
 {
   FNGETNATIVESYSTEMINFO GetNativeSystemInfo_ = (FNGETNATIVESYSTEMINFO)
-    GetProcAddress(GetModuleHandleA("kernel32.dll"), "GetNativeSystemInfo");
+    GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetNativeSystemInfo");
 
   memset(sysinfo, 0, sizeof *sysinfo);
   if (local_sysinfo)
@@ -539,12 +1087,12 @@ enum_loaded_modules(apr_pool_t *pool)
   DWORD size;
   FNENUMPROCESSMODULES EnumProcessModules_;
 
-  psapi_dll = GetModuleHandleA("psapi.dll");
+  psapi_dll = GetModuleHandleW(L"psapi.dll");
 
   if (!psapi_dll)
     {
       /* Load and never unload, just like static linking */
-      psapi_dll = LoadLibraryA("psapi.dll");
+      psapi_dll = LoadLibraryW(L"psapi.dll");
     }
 
   if (!psapi_dll)
@@ -776,41 +1324,70 @@ value_from_dict(CFDictionaryRef plist, CFStringRef key, apr_pool_t *pool)
   return value;
 }
 
-/* Return the commercial name of the OS, given the version number in
+/* Return the minor version the operating system, given the number in
    a format that matches the regular expression /^10\.\d+(\..*)?$/ */
-static const char *
-release_name_from_version(const char *osver)
+static int
+macos_minor_version(const char *osver)
 {
   char *end = NULL;
   unsigned long num = strtoul(osver, &end, 10);
 
   if (!end || *end != '.' || num != 10)
-    return NULL;
+    return -1;
 
   osver = end + 1;
   end = NULL;
   num = strtoul(osver, &end, 10);
   if (!end || (*end && *end != '.'))
-    return NULL;
+    return -1;
 
-  /* See http://en.wikipedia.org/wiki/History_of_OS_X#Release_timeline */
-  switch(num)
+  return (int)num;
+}
+
+/* Return the product name of the operating system. */
+static const char *
+product_name_from_minor_version(int minor, const char* product_name)
+{
+  /* We can only do this if we know the official product name. */
+  if (0 != strcmp(product_name, "Mac OS X"))
+    return product_name;
+
+  if (minor <= 7)
+    return product_name;
+
+  if (minor <= 11)
+    return "OS X";
+
+  return "macOS";
+}
+
+/* Return the commercial name of the operating system. */
+static const char *
+release_name_from_minor_version(int minor, const char* product_name)
+{
+  /* We can only do this if we know the official product name. */
+  if (0 == strcmp(product_name, "Mac OS X"))
     {
-    case  0: return "Cheetah";
-    case  1: return "Puma";
-    case  2: return "Jaguar";
-    case  3: return "Panther";
-    case  4: return "Tiger";
-    case  5: return "Leopard";
-    case  6: return "Snow Leopard";
-    case  7: return "Lion";
-    case  8: return "Mountain Lion";
-    case  9: return "Mavericks";
-    case 10: return "Yosemite";
-    case 11: return "El Capitan";
-    case 12: return "Sierra";
+      /* See https://en.wikipedia.org/wiki/MacOS_version_history#Releases */
+      switch(minor)
+        {
+        case  0: return "Cheetah";
+        case  1: return "Puma";
+        case  2: return "Jaguar";
+        case  3: return "Panther";
+        case  4: return "Tiger";
+        case  5: return "Leopard";
+        case  6: return "Snow Leopard";
+        case  7: return "Lion";
+        case  8: return "Mountain Lion";
+        case  9: return "Mavericks";
+        case 10: return "Yosemite";
+        case 11: return "El Capitan";
+        case 12: return "Sierra";
+        case 13: return "High Sierra";
+        case 14: return "Mojave";
+        }
     }
-
   return NULL;
 }
 
@@ -833,20 +1410,23 @@ macos_release_name(apr_pool_t *pool)
                                           CFSTR("ProductBuildVersion"),
                                           pool);
       const char *release;
+      int minor_version;
 
       if (!osver)
         osver = value_from_dict(plist, CFSTR("ProductVersion"), pool);
-      release = release_name_from_version(osver);
+      minor_version = macos_minor_version(osver);
+      release = release_name_from_minor_version(minor_version, osname);
+      osname = product_name_from_minor_version(minor_version, osname);
 
       CFRelease(plist);
       return apr_psprintf(pool, "%s%s%s%s%s%s%s%s",
                           (osname ? osname : ""),
-                          (osver ? (osname ? " " : "") : ""),
-                          (osver ? osver : ""),
-                          (release ? (osname||osver ? " " : "") : ""),
+                          (release ? (osname ? " " : "") : ""),
                           (release ? release : ""),
+                          (osver ? (osname||release ? " " : "") : ""),
+                          (osver ? osver : ""),
                           (build
-                           ? (osname||osver||release ? ", " : "")
+                           ? (osname||release||osver ? ", " : "")
                            : ""),
                           (build
                            ? (server ? "server build " : "build ")

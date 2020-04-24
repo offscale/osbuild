@@ -1,0 +1,5 @@
+#ifndef OSBUILD_VERSION_H
+#define OSBUILD_VERSION_H
+
+
+#endif //OSBUILD_VERSION_H
