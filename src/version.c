@@ -1,10 +1,10 @@
+#if __linux__
 #include <string.h>
 
-#include "version.h"
-
-#if __linux__
 #include "systemd.h"
 #endif
+
+#include "version.h"
 
 
 inline const char* get_distribution(void) {

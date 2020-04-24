@@ -29,7 +29,6 @@ const char* parse_id_from_os_release(const char* filename) {
         switch (c) {
             case '"':
             case ' ':
-                break;
             case '\n':
                 if (correct_line) {
                     candidate[cursor+1] = '\0';
