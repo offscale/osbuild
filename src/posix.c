@@ -4,6 +4,7 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #else
 #include <sys/param.h>
+#include <errno.h>
 #endif
 
 #if defined(__FREEBSD__) ||  defined (__APPLE__) && defined (__MACH__)
