@@ -8,8 +8,11 @@
 #include "posix.h"
 #include "errors.h"
 
-#if defined(__FreeBSD__) ||  defined (__APPLE__) && defined (__MACH__)
-#define ENOPKG 65
+#if defined(__FreeBSD__) || defined (__APPLE__) && defined (__MACH__)
+#include <sys/wait.h>
+#ifndef ENOPKG
+#define ENOPKG 6565
+#endif
 #endif
 
 int execute_bin(const char *const *const args) {
