@@ -1,6 +1,10 @@
 #include "posix.h"
 #include "errors.h"
 
+#if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_MSC_VER)
+#include <sys/param.h>
+#endif
+
 #if defined(__FREEBSD__) ||  defined (__APPLE__) && defined (__MACH__)
 #define ENOPKG 65
 #endif

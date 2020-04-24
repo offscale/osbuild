@@ -7,8 +7,7 @@ set(HOMEPAGE_URL "https://github.com/offscale/osbuild")
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-set(src src/main.c
-        src/version)
+set(src src/main.c src/version)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     list(APPEND src src/win_build_deps)

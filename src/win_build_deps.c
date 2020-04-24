@@ -1,6 +1,6 @@
 #ifndef OSBUILD_WIN_BUILD_DEPS_H
 #define OSBUILD_WIN_BUILD_DEPS_H
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_MSC_VER)
 
 #include <stdio.h>
 #include <stdlib.h>
