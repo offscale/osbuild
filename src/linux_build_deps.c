@@ -4,21 +4,16 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include <svn_pools.h>
+#include <string.h>
 
 #include "posix.h"
 #include "build_deps.h"
-#include "linux_version.h"
-#include "sys/sysinfo.h"
+/*#include "linux_version.h"*/
 
 #define PROGRAM "/usr/bin/apt-get"
 
 
 inline int deb_install_build_dependencies(void) {
-    apr_pool_t *pool;
-    pool = apr_allocator_owner_get(svn_pool_create_allocator(FALSE));
-    printf("Running on %s\n", svn_sysinfo__release_name(pool));
-    svn_pool_destroy(pool);
     static const char * const program = "/usr/bin/apt-get";
 
     static const char *const args0[4] = {PROGRAM, "update", "-q", NULL};
@@ -29,7 +24,7 @@ inline int deb_install_build_dependencies(void) {
     return execute_bin(args1);
 }
 
-inline int install_build_dependencies(void) {
+inline int install_build_dependencies(const char* distribution) {
     /*
     static const FILE *fp = fopen("/etc/os-release", "r");
     if (!fp) {
@@ -40,7 +35,12 @@ inline int install_build_dependencies(void) {
         return ENOENT;
     }
      */
-    return deb_install_build_dependencies();
+    if (strcmp(distribution, "ubuntu") == 0 || strcmp(distribution, "debian") == 0)
+        return deb_install_build_dependencies();
+    else {
+        fprintf(stderr, "Unsupported Linux distribution: %s", distribution);
+        return EPROTONOSUPPORT;
+    }
 }
 
 #endif
