@@ -17,8 +17,8 @@ inline int install_build_dependencies(const char* distribution) {
     struct utsname unameD;
     uname(&unameD);
     if (strcmp(unameD.nodename, "openindiana") == 0) {
-        static const char *const args[5] = {
-            PROGRAM, "pkg", "install", "pkg://openindiana.org/metapackages/build-essential", NULL
+        static const char *const args[4] = {
+            PROGRAM, "install", "pkg://openindiana.org/metapackages/build-essential", NULL
         };
         return execute_bin(args);
     }
