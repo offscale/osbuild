@@ -1,5 +1,5 @@
-#ifndef OSBUILD_FREEBSD_BUILD_DEPS_H
-#define OSBUILD_FREEBSD_BUILD_DEPS_H
+#ifndef OSBUILD_SOLARIS_BUILD_DEPS_H
+#define OSBUILD_SOLARIS_BUILD_DEPS_H
 
 #if defined(__sun) && defined(__SVR4)
 
@@ -17,7 +17,7 @@ inline int install_build_dependencies(const char* distribution) {
     struct utsname unameD;
     uname(&unameD);
     if (strcmp(unameD.nodename, "openindiana") == 0) {
-        static const char *const args[4] = {
+        static const char *const args[5] = {
             PROGRAM, "pkg", "install", "pkg://openindiana.org/metapackages/build-essential", NULL
         };
         return execute_bin(args);
@@ -25,4 +25,5 @@ inline int install_build_dependencies(const char* distribution) {
     return UNIMPLEMENTED;
 }
 
+#endif
 #endif
