@@ -5,15 +5,15 @@
 #include <sys/param.h>
 #include <errno.h>
 
-#include "posix.h"
-#include "errors.h"
-
-#if defined(__FreeBSD__) || defined (__APPLE__) && defined (__MACH__)
+#if defined(__FreeBSD__) || defined (__APPLE__) && defined (__MACH__) || defined(__sun) && defined(__SVR4)
 #include <sys/wait.h>
 #ifndef ENOPKG
 #define ENOPKG 6565
 #endif
 #endif
+
+#include "posix.h"
+#include "errors.h"
 
 int execute_bin(const char *const *const args) {
     int status;

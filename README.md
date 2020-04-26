@@ -12,10 +12,11 @@ Supports:
     - [x] Debian (and distros based upon, e.g., Ubuntu)
   - [x] macOS
   - [x] Windows
-  - [ ] Solaris
-  - [ ] illumos
+  - [ ] Solaris/illumos
+    - [ ] OpenIndiana
   - [ ] BSD
     - [x] FreeBSD (and distros based upon, e.g., DragonflyBSD)
+    - [ ] NetBSD
     - [ ] OpenBSD
 
 ## Docker
@@ -24,15 +25,6 @@ Supports:
 
     docker build . -f Dockerfile.ubuntu --tag osbuild
     docker run osbuild
-
-## Dependencies
-
-apr headers, install with:
-
-
-### Ubuntu
-
-    sudo apt-get install libapr1-dev
 
 ---
 

@@ -17,7 +17,7 @@
 #define PROGRAM "/usr/local/sbin/pkg"
 
 inline int install_build_dependencies(const char* distribution) {
-    static const char const*const args[4] = {PROGRAM, "info", "pkg", NULL};
+    static const char *const args[4] = {PROGRAM, "info", "pkg", NULL};
     return execute_bin(args);
 }
 
