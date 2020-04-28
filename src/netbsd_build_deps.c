@@ -5,7 +5,7 @@
 #include <sys/param.h>
 #endif
 
-#ifdef __FreeBSD__
+#ifdef __NetBSD__
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -14,17 +14,14 @@
 #include "build_deps.h"
 #include "bsd.h"
 
-#define PROGRAM "/usr/local/sbin/pkg"
-
 inline bool osbuild_is_installed(const char *distribution) {
-    return exists(PROGRAM) && osbuild_for_bsd_is_installed();
+    return exist("/usr/sbin/pkg_info") && osbuild_for_bsd_is_installed();
 }
 
 inline int osbuild_install_build_dependencies(const char* distribution) {
-    if (osbuild_is_installed(const char *distribution)) return EXIT_SUCCESS;
-    fprintf(stderr,
-            "Congratulations: you built a custom FreeBSD without build-tools. You're on your own!\n");
-    return EXIT_FAILURE;
+    return osbuild_is_installed(distribution);
+    // TODO: If false, download http://<mirror>/pub/NetBSD/NetBSD-<VERSION>/<ARCH>/binary/sets/comp.tgz
+    //       && tar --unlink -zxvpf .../comp.tgz
 }
 
 #endif

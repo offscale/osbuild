@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 project(osbuild
-        VERSION "0.0.3"
+        VERSION "0.0.4"
         DESCRIPTION "Installs compiler and build tools for your platform"
         LANGUAGES C)
 set(HOMEPAGE_URL "https://github.com/offscale/osbuild")
@@ -22,6 +22,8 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     list(APPEND src src/systemd src/linux_build_deps)
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
     list(APPEND src src/freebsd_build_deps)
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "NetBSD")
+    list(APPEND src src/netbsd_build_deps)
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
     list(APPEND src src/macos_build_deps)
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "SunOS")

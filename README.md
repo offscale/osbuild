@@ -12,11 +12,11 @@ Supports:
     - [x] Debian (and distros based upon, e.g., Ubuntu)
   - [x] macOS
   - [x] Windows
-  - [ ] Solaris/illumos
-    - [ ] OpenIndiana
+  - [ ] Solaris/OpenSolaris/illumos
+    - [x] OpenIndiana
   - [ ] BSD
     - [x] FreeBSD (and distros based upon, e.g., DragonflyBSD)
-    - [ ] NetBSD
+    - [x] NetBSD
     - [ ] OpenBSD
 
 ## Docker

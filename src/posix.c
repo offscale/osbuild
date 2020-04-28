@@ -1,15 +1,14 @@
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__)
 
-#else
-
-#include <sys/param.h>
 #include <errno.h>
-
-#if defined(__FreeBSD__) || defined (__APPLE__) && defined (__MACH__) || defined(__sun) && defined(__SVR4)
+#include <stdbool.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+
 #ifndef ENOPKG
 #define ENOPKG 6565
-#endif
 #endif
 
 #include "posix.h"
@@ -41,7 +40,7 @@ int execute_bin(const char *const *const args) {
 }
 
 // Edited from https://svnweb.freebsd.org/base/stable/12/usr.bin/which/which.c?revision=339434&view=markup&pathrev=339434#l105
-int exists(const char *candidate) {
+bool exists(const char *candidate) {
     struct stat fin;
 
     // XXX work around access(2) false positives for superuser
@@ -50,9 +49,9 @@ int exists(const char *candidate) {
         S_ISREG(fin.st_mode) &&
         (getuid() != 0 ||
          (fin.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0)) {
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 #endif

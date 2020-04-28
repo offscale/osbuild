@@ -1,6 +1,9 @@
 #ifndef OSBUILD_BUILD_DEPS_H
 #define OSBUILD_BUILD_DEPS_H
 
-extern inline int install_build_dependencies(const char*);
+#include <stdbool.h>
+
+extern inline int osbuild_install_build_dependencies(const char*);
+extern inline bool osbuild_is_installed(const char*);
 
 #endif

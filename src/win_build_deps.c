@@ -20,7 +20,7 @@ BOOL exists(TCHAR *);
 
 #define PROGRAM "C:\\ProgramData\\chocolatey\\bin\\choco.exe"
 
-inline int install_build_dependencies(const char* distribution) {
+inline int osbuild_install_build_dependencies(const char* distribution) {
     // Maybe check if chocolately is installed, and if it is, run `choco install visualstudio2019buildtools` in PS
     // Maybe rewrite https://chocolatey.org/install.ps1 in C?
     if (exists("cl"))
@@ -73,5 +73,4 @@ BOOL exists(TCHAR *absolute_bin_path) {
     return FALSE;
 }
 
-#endif
 #endif
