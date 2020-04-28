@@ -16,14 +16,19 @@
 #include "errors.h"
 
 int execute_bin(TCHAR *, TCHAR *);
-BOOL exists(TCHAR *);
+bool exists(TCHAR *);
 
 #define PROGRAM "C:\\ProgramData\\chocolatey\\bin\\choco.exe"
+
+inline bool osbuild_is_installed(const char* distribution) {
+    return exists("cl") && exists("nmake");
+}
 
 inline int osbuild_install_build_dependencies(const char* distribution) {
     // Maybe check if chocolately is installed, and if it is, run `choco install visualstudio2019buildtools` in PS
     // Maybe rewrite https://chocolatey.org/install.ps1 in C?
-    if (exists("cl"))
+
+    if (osbuild_is_installed(distribution))
         return EXIT_SUCCESS;
     else if (exists(PROGRAM))
         return execute_bin(PROGRAM, "install visualstudio2019buildtools");
@@ -68,9 +73,10 @@ int execute_bin(TCHAR *absolute_bin_path, TCHAR *input) {
     return EXIT_SUCCESS;
 }
 
-BOOL exists(TCHAR *absolute_bin_path) {
+bool exists(TCHAR *absolute_bin_path) {
     // TODO: Check if path is accessible and executable
-    return FALSE;
+    return true;
 }
 
+#endif
 #endif

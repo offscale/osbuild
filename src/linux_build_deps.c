@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #include "posix.h"
 #include "build_deps.h"
@@ -18,7 +19,6 @@ inline bool osbuild_is_installed(const char* distribution) {
 }
 
 inline int _deb_install_build_dependencies(void) {
-    osbuild_is_installed()
     static const char * const program = "/usr/bin/apt-get";
 
     static const char *const args0[4] = {PROGRAM, "update", "-q", NULL};
@@ -40,7 +40,9 @@ inline int osbuild_install_build_dependencies(const char* distribution) {
         return ENOENT;
     }
      */
-    if (strcmp(distribution, "debian") == 0)
+    if (osbuild_is_installed(distribution))
+        return EXIT_SUCCESS;
+    else if (strcmp(distribution, "debian") == 0)
         return _deb_install_build_dependencies();
     else {
         fprintf(stderr, "Unsupported Linux distribution: %s", distribution);

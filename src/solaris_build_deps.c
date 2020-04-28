@@ -19,7 +19,7 @@ inline bool osbuild_is_installed(const char* distribution) {
 }
 
 inline int osbuild_install_build_dependencies(const char* distribution) {
-    if (osbuild_is_installed()) return EXIT_SUCCESS;
+    if (osbuild_is_installed(distribution)) return EXIT_SUCCESS;
 
     struct utsname unameD;
     uname(&unameD);
