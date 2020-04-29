@@ -23,7 +23,7 @@ inline bool osbuild_is_installed(const char *distribution) {
 }
 
 inline int osbuild_install_build_dependencies(const char* distribution) {
-    if (osbuild_is_installed(const char *distribution)) return EXIT_SUCCESS;
+    if (osbuild_is_installed(distribution)) return EXIT_SUCCESS;
     fprintf(stderr,
             "Congratulations: you built a custom FreeBSD without build-tools. You're on your own!\n");
     return EXIT_FAILURE;
