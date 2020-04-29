@@ -15,11 +15,11 @@
 #define PROGRAM "/usr/bin/apt-get"
 
 inline bool osbuild_is_installed(const char* distribution) {
-    return exist(PROGRAM) && (exists("/usr/bin/gcc") || exists("/usr/bin/clang"))
+    return exists(PROGRAM) && (exists("/usr/bin/gcc") || exists("/usr/bin/clang"))
            && exists("/usr/bin/ld") && exists("/usr/bin/make") && exists("/usr/lib/libc.so");
 }
 
-inline int _deb_install_build_dependencies(void) {
+inline int deb_install_build_dependencies(void) {
     static const char * const program = "/usr/bin/apt-get";
 
     static const char *const args0[4] = {PROGRAM, "update", "-q", NULL};
@@ -44,11 +44,12 @@ inline int osbuild_install_build_dependencies(const char* distribution) {
     if (osbuild_is_installed(distribution))
         return EXIT_SUCCESS;
     else if (strcmp(distribution, "debian") == 0)
-        return _deb_install_build_dependencies();
+        return deb_install_build_dependencies();
     else {
         fprintf(stderr, "Unsupported Linux distribution: %s", distribution);
         return EPROTONOSUPPORT;
     }
 }
 
+#endif
 #endif
