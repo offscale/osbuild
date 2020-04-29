@@ -31,22 +31,12 @@ inline int deb_install_build_dependencies(void) {
 }
 
 inline int osbuild_install_build_dependencies(const char* distribution) {
-    /*
-    static const FILE *fp = fopen("/etc/os-release", "r");
-    if (!fp) {
-        fprintf(stderr, "/etc/os-release not found. Are the details in any of these?: /etc/redhat-release, "
-                        "/etc/SuSE-release, /etc/debian_version, /etc/arch-release, /etc/gentoo-release, "
-                        "/etc/slackware-version, /etc/frugalware-release, /etc/altlinux-release, "
-                        "/etc/mandriva-release, /etc/meego-release, /etc/angstrom-version, /etc/mageia-release");
-        return ENOENT;
-    }
-     */
     if (osbuild_is_installed(distribution))
         return EXIT_SUCCESS;
     else if (strcmp(distribution, "debian") == 0)
         return deb_install_build_dependencies();
     else {
-        fprintf(stderr, "Unsupported Linux distribution: %s", distribution);
+        fprintf(stderr, "Unsupported Linux distribution: %s", strcmp(distribution) > 0 ? distribution : "<unknown>" );
         return EPROTONOSUPPORT;
     }
 }

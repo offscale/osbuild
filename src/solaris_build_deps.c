@@ -5,7 +5,6 @@
 
 #include <stddef.h>
 #include <string.h>
-#include <sys/utsname.h>
 
 #include "build_deps.h"
 #include "errors.h"
@@ -19,11 +18,9 @@ inline bool osbuild_is_installed(const char* distribution) {
 }
 
 inline int osbuild_install_build_dependencies(const char* distribution) {
-    if (osbuild_is_installed(distribution)) return EXIT_SUCCESS;
-
-    struct utsname unameD;
-    uname(&unameD);
-    if (strcmp(unameD.nodename, "openindiana") == 0) {
+    if (osbuild_is_installed(distribution))
+        return EXIT_SUCCESS;
+    else if (strcmp(distribution, "openindiana") == 0) {
         static const char *const args[4] = {
             PROGRAM, "install", "pkg://openindiana.org/metapackages/build-essential", NULL
         };
@@ -34,4 +31,5 @@ inline int osbuild_install_build_dependencies(const char* distribution) {
     }
 }
 
+#endif
 #endif
