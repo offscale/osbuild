@@ -36,7 +36,7 @@ inline int osbuild_install_build_dependencies(const char* distribution) {
     else if (strcmp(distribution, "debian") == 0)
         return deb_install_build_dependencies();
     else {
-        fprintf(stderr, "Unsupported Linux distribution: %s", strcmp(distribution) > 0 ? distribution : "<unknown>" );
+        fprintf(stderr, "Unsupported Linux distribution: %s", strlen(distribution) > 0 ? distribution : "<unknown>" );
         return EPROTONOSUPPORT;
     }
 }
