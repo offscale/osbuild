@@ -19,10 +19,10 @@
 #define PROGRAM "/usr/local/sbin/pkg"
 
 inline bool osbuild_is_installed(const char *distribution) {
-    return exists(PROGRAM) && osbuild_for_bsd_is_installed();
+    return access(PROGRAM, F_OK) == 0 && osbuild_for_bsd_is_installed();
 }
 
-inline int osbuild_install_build_dependencies(const char* distribution) {
+inline int osbuild_install_build_dependencies(const char* distribution, const bool update) {
     if (osbuild_is_installed(distribution)) return EXIT_SUCCESS;
     fprintf(stderr,
             "Congratulations: you built a custom FreeBSD without build-tools. You're on your own!\n");

@@ -9,12 +9,11 @@
 
 #include <stddef.h>
 #include <stdbool.h>
-
-#include "posix.h"
+#include <unistd.h>
 
 inline bool osbuild_for_bsd_is_installed() {
-    return exists("/usr/bin/cc") && exists("/usr/bin/ld")
-           && exists("/usr/bin/make") && exists("/usr/lib/libc.a");
+    return access("/usr/bin/cc", F_OK) == 0 && access("/usr/bin/ld", F_OK) == 0
+           && access("/usr/bin/make", F_OK) == 0 && access("/usr/lib/libc.a", F_OK) == 0;
 }
 
 #endif

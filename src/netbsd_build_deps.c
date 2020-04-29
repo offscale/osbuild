@@ -9,13 +9,13 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <unistd.h>
 
-#include "posix.h"
 #include "build_deps.h"
 #include "bsd.h"
 
 inline bool osbuild_is_installed(const char *distribution) {
-    return exists("/usr/sbin/pkg_info") && osbuild_for_bsd_is_installed();
+    return access("/usr/sbin/pkg_info", F_OK) && osbuild_for_bsd_is_installed();
 }
 
 inline int osbuild_install_build_dependencies(const char* distribution) {

@@ -13,8 +13,10 @@
 #define PROGRAM "/usr/bin/pkg"
 
 inline bool osbuild_is_installed(const char* distribution) {
-    return exist(PROGRAM) && (exists("/usr/bin/gcc") || exists("/usr/bin/clang"))
-           && exists("/usr/bin/ld") && exists("/usr/bin/make") && exists("/usr/lib/libc.so");
+    return exist(PROGRAM, F_OK) == 0
+           && (access("/usr/bin/gcc", F_OK) == 0 || access("/usr/bin/clang", F_OK) == 0)
+           && access("/usr/bin/ld", F_OK) == 0 && access("/usr/bin/make", F_OK) == 0
+           && access("/usr/lib/libc.so", F_OK) == 0;
 }
 
 inline int osbuild_install_build_dependencies(const char* distribution) {

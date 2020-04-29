@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-extern inline int osbuild_install_build_dependencies(const char*);
+extern inline int osbuild_install_build_dependencies(const char*,bool update);
 extern inline bool osbuild_is_installed(const char*);
 
 #endif

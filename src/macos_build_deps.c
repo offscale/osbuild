@@ -5,16 +5,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <unistd.h>
 
-#include "posix.h"
 #include "build_deps.h"
 
 inline bool osbuild_is_installed(const char *distribution) {
-    return exists("/usr/bin/cc") && exists("/usr/bin/make") && exists("/Applications/Xcode.app/Contents/Developer");
+    return access("/usr/bin/cc", F_OK) == 0 && access("/usr/bin/make", F_OK) == 0
+           && access("/Applications/Xcode.app/Contents/Developer", F_OK) == 0;
 }
 
-inline int osbuild_install_build_dependencies(const char *distribution) {
+inline int osbuild_install_build_dependencies(const char *distribution, const bool update) {
     // Maybe rewrite https://github.com/Homebrew/install/blob/master/install.sh in C?
+    printf("access(\"/Applications/Xcode.app/Contents/Developer\"):\t%d\n", access("/Applications/Xcode.app/Contents/Developer", F_OK));
+
     if (osbuild_is_installed(distribution)) return EXIT_SUCCESS;
     fprintf(stderr,
             "macOS requires https://developer.apple.com/xcode & its developer tools to be installed manually.\n");

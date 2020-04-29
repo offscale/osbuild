@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 extern bool exists(const char *);
-extern int execute_bin(const char *const *const);
+extern int execute_bin(const char *const *);
 
 #endif
 #endif //OSBUILD_POSIX_H
