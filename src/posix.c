@@ -44,14 +44,8 @@ bool exists(const char *candidate) {
     struct stat fin;
 
     // XXX work around access(2) false positives for superuser
-    if (access(candidate, X_OK) == 0 &&
-        stat(candidate, &fin) == 0 &&
-        S_ISREG(fin.st_mode) &&
-        (getuid() != 0 ||
-         (fin.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0)) {
-        return true;
-    }
-    return false;
+    return access(candidate, X_OK) == 0 && stat(candidate, &fin) == 0 && S_ISREG(fin.st_mode)
+           && (getuid() != 0 || (fin.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0);
 }
 
 #endif

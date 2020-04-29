@@ -2,12 +2,11 @@
 #define OSBUILD_LINUX_BUILD_DEPS_H
 #ifdef __linux__
 
-#include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdbool.h>
-#include <string.h>
 #include <errno.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "posix.h"
@@ -25,17 +24,25 @@ inline bool osbuild_is_installed(const char* distribution) {
 
 inline int alpine_install_build_dependencies(bool update) {
     if (access(ALPINE_APK, F_OK) != 0) return EXIT_FAILURE;
+    else if (update) {
+        static const char *const args1[3] = {ALPINE_APK, "update", NULL};
+        return execute_bin(args1);
+    } else if (getenv("NO_CACHE") != NULL) {
+        static const char *const args1[5] = {ALPINE_APK, "--no-cache", "add", "build-base", NULL};
+        return execute_bin(args1);
+    }
+
     static const char *const args1[4] = {ALPINE_APK, "add", "build-base", NULL};
     return execute_bin(args1);
 }
 
 inline int deb_install_build_dependencies(bool update) {
-    if (access(APT_GET, F_OK) != 0) return EXIT_FAILURE;
-
-    static const char *const args0[4] = {APT_GET, "update", "-q", NULL};
-    const int ret = execute_bin(args0);
-    if (ret != 0) return ret;
-
+    if(access(APT_GET, F_OK) != 0) return EXIT_FAILURE;
+    else if(update) {
+        static const char *const args0[4] = {APT_GET, "update", "-q", NULL};
+        const int ret = execute_bin(args0);
+        if (ret != 0) return ret;
+    }
     static const char *const args1[5] = {APT_GET, "install", "-y", "build-essential", NULL};
     return execute_bin(args1);
 }
