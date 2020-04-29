@@ -14,6 +14,8 @@ inline const char* get_distribution(void) {
     return "Windows";
 #elif defined(__FreeBSD__)
     return "FreeBSD";
+#elif defined(__NetBSD__)
+    return "NetBSD";
 #elif defined (__APPLE__) && defined (__MACH__)
     return "macOS";
 #elif __linux__

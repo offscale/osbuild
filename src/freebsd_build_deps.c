@@ -30,3 +30,4 @@ inline int osbuild_install_build_dependencies(const char* distribution) {
 }
 
 #endif
+#endif

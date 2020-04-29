@@ -1,5 +1,5 @@
-#ifndef OSBUILD_FREEBSD_BUILD_DEPS_H
-#define OSBUILD_FREEBSD_BUILD_DEPS_H
+#ifndef OSBUILD_NETBSD_BUILD_DEPS_H
+#define OSBUILD_NETBSD_BUILD_DEPS_H
 
 #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__)
 #include <sys/param.h>
@@ -15,7 +15,7 @@
 #include "bsd.h"
 
 inline bool osbuild_is_installed(const char *distribution) {
-    return exist("/usr/sbin/pkg_info") && osbuild_for_bsd_is_installed();
+    return exists("/usr/sbin/pkg_info") && osbuild_for_bsd_is_installed();
 }
 
 inline int osbuild_install_build_dependencies(const char* distribution) {
@@ -24,4 +24,5 @@ inline int osbuild_install_build_dependencies(const char* distribution) {
     //       && tar --unlink -zxvpf .../comp.tgz
 }
 
+#endif
 #endif
