@@ -24,11 +24,11 @@ inline bool osbuild_is_installed(const char* distribution) {
     return exists("cl") && exists("nmake");
 }
 
-inline int osbuild_install_build_dependencies(const char* distribution) {
+inline int osbuild_install_build_dependencies(const struct DocoptArgs args) {
     // Maybe check if chocolately is installed, and if it is, run `choco install visualstudio2019buildtools` in PS
     // Maybe rewrite https://chocolatey.org/install.ps1 in C?
 
-    if (osbuild_is_installed(distribution))
+    if (osbuild_is_installed(args.distribution))
         return EXIT_SUCCESS;
     else if (exists(PROGRAM))
         return execute_bin(PROGRAM, "install visualstudio2019buildtools");

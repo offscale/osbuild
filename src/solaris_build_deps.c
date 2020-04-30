@@ -19,14 +19,14 @@ inline bool osbuild_is_installed(const char* distribution) {
            && access("/usr/lib/libc.so", F_OK) == 0;
 }
 
-inline int osbuild_install_build_dependencies(const char* distribution) {
-    if (osbuild_is_installed(distribution))
+inline int osbuild_install_build_dependencies(const struct DocoptArgs args) {
+    if (osbuild_is_installed(args.distribution))
         return EXIT_SUCCESS;
-    else if (strcmp(distribution, "openindiana") == 0) {
-        static const char *const args[4] = {
+    else if (strcmp(args.distribution, "openindiana") == 0) {
+        static const char *const exec_args[4] = {
             PROGRAM, "install", "pkg://openindiana.org/metapackages/build-essential", NULL
         };
-        return execute_bin(args);
+        return execute_bin(exec_args);
     } else {
         fprintf(stderr, "Unsupported Solaris/OpenSolaris/illumos distribution: %s", distribution);
         return EPROTONOSUPPORT;

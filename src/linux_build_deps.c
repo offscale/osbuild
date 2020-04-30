@@ -23,9 +23,9 @@ inline bool osbuild_is_installed(const char* distribution) {
            && access("/usr/lib/libc.so", F_OK) == 0;
 }
 
-inline int alpine_install_build_dependencies(bool update) {
+inline int alpine_install_build_dependencies(bool no_update) {
     if (access(ALPINE_APK, F_OK) != 0) return ENOENT;
-    else if (update) {
+    else if (!no_update) {
         static const char *const args1[3] = {ALPINE_APK, "update", NULL};
         return execute_bin(args1);
     } else if (getenv("NO_CACHE") != NULL) {
@@ -37,9 +37,9 @@ inline int alpine_install_build_dependencies(bool update) {
     return execute_bin(args1);
 }
 
-inline int deb_install_build_dependencies(bool update) {
-    if(access(APT_GET, F_OK) != 0) return ENOENT;
-    else if(update) {
+inline int deb_install_build_dependencies(bool no_update) {
+    if (access(APT_GET, F_OK) != 0) return ENOENT;
+    else if (!no_update) {
         static const char *const args0[4] = {APT_GET, "update", "-qq", NULL};
         const int ret = execute_bin(args0);
         if (ret != 0) return ret;
@@ -48,22 +48,23 @@ inline int deb_install_build_dependencies(bool update) {
     return execute_bin(args1);
 }
 
-inline int osbuild_install_build_dependencies(const char* distribution, const DocoptArgs args) {
-    printf("osbuild_is_installed:\t\t\t\t\t%d\n", osbuild_is_installed(distribution));
+inline int osbuild_install_build_dependencies(const struct DocoptArgs args) {
+    printf("osbuild_is_installed:\t\t\t\t\t%d\n", (const char*) osbuild_is_installed(args.distribution));
     printf("access(\"/usr/bin/clang\", F_OK) == 0:\t%d\n", access("/usr/bin/clang", F_OK) == 0);
     printf("access(\"/usr/bin/gcc\", F_OK) == 0:\t%d\n", access("/usr/bin/gcc", F_OK) == 0);
     printf("access(\"/usr/bin/ld\", F_OK) == 0:\t%d\n", access("/usr/bin/ld", F_OK) == 0);
     printf("access(\"/usr/bin/make\", F_OK) == 0:\t%d\n", access("/usr/bin/make", F_OK) == 0);
     printf("access(\"/usr/lib/libc.so\", F_OK) == 0:\t%d\n", access("/usr/lib/libc.so", F_OK) == 0);
 
-    if (osbuild_is_installed(distribution))
+    if (osbuild_is_installed(args.distribution))
         return EXIT_SUCCESS;
-    else if (strcmp(distribution, "alpine") == 0)
-        return alpine_install_build_dependencies(args.update);
-    else if (strcmp(distribution, "debian") == 0)
-        return deb_install_build_dependencies(args.update);
+    else if (strcmp(args.distribution, "alpine") == 0)
+        return alpine_install_build_dependencies(args.no_update);
+    else if (strcmp(args.distribution, "debian") == 0)
+        return deb_install_build_dependencies(args.no_update);
     else {
-        fprintf(stderr, "Unsupported Linux distribution: %s", strlen(distribution) > 0 ? distribution : "<unknown>" );
+        fprintf(stderr, "Unsupported Linux distribution: %s", strlen(args.distribution) > 0 ?
+                               args.distribution : "<unknown>" );
         return EPROTONOSUPPORT;
     }
 }

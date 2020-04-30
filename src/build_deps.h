@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "docopt.h"
 
-extern inline int osbuild_install_build_dependencies(const char*,struct DocoptArgs);
+extern inline int osbuild_install_build_dependencies(struct DocoptArgs);
 extern inline bool osbuild_is_installed(const char*);
 
 #endif

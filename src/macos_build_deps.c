@@ -14,11 +14,10 @@ inline bool osbuild_is_installed(const char *distribution) {
            && access("/Applications/Xcode.app/Contents/Developer", F_OK) == 0;
 }
 
-inline int osbuild_install_build_dependencies(const char *distribution, const bool update) {
+inline int osbuild_install_build_dependencies(const struct DocoptArgs args) {
     // Maybe rewrite https://github.com/Homebrew/install/blob/master/install.sh in C?
-    printf("access(\"/Applications/Xcode.app/Contents/Developer\"):\t%d\n", access("/Applications/Xcode.app/Contents/Developer", F_OK));
 
-    if (osbuild_is_installed(distribution)) return EXIT_SUCCESS;
+    if (osbuild_is_installed(args.distribution)) return EXIT_SUCCESS;
     fprintf(stderr,
             "macOS requires https://developer.apple.com/xcode & its developer tools to be installed manually.\n");
     return EXIT_FAILURE;

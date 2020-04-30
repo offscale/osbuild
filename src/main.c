@@ -3,16 +3,17 @@
 #include <stdbool.h>
 
 #include "build_deps.h"
-#include "docopt.c"
+#include "docopt.h"
 #include "distribution.h"
-#define VERSION "0.0.1"
+
 /*
 #include "version.h"
 */
+#define VERSION "0.0.1"
 
 int main(int argc, char *argv[])
 {
-    DocoptArgs args = docopt(argc, argv, /* help */ 1, /* version */ VERSION);
+    struct DocoptArgs args = docopt(argc, argv, /* help */ 1, /* version */ VERSION);
     /* TODO: Ensure environment variables don't take priority over CLI arguments */
     const char *no_cache = getenv("NO_CACHE");
     if (no_cache != NULL && args.no_cache == 0) args.no_cache = (bool)no_cache;
@@ -26,8 +27,10 @@ int main(int argc, char *argv[])
     printf("    args.no_check == %s\n", args.no_check ? "true" : "false");
     printf("    args.no_update == %s\n", args.no_update ? "true" : "false");
     printf("    args.check == %s\n", args.check ? "true" : "false");
+    printf("    args.distribution == %s\n", (const char*)args.distribution);
 
-    const char *distribution = get_distribution();
+    const char *distribution = "macOS" /* get_distribution() */;
     printf("Running on %s\n", distribution);
-    return osbuild_is_installed(distribution)? EXIT_SUCCESS : osbuild_install_build_dependencies(distribution, args);
+    return osbuild_is_installed(args.distribution == 0 ? (const char*)args.distribution: distribution) ?
+           EXIT_SUCCESS : osbuild_install_build_dependencies(args);
 }

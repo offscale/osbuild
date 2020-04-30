@@ -22,8 +22,8 @@ inline bool osbuild_is_installed(const char *distribution) {
     return access(PROGRAM, F_OK) == 0 && osbuild_for_bsd_is_installed();
 }
 
-inline int osbuild_install_build_dependencies(const char* distribution, const bool update) {
-    if (osbuild_is_installed(distribution)) return EXIT_SUCCESS;
+inline int osbuild_install_build_dependencies(struct DocoptArgs args) {
+    if (osbuild_is_installed(args.distribution)) return EXIT_SUCCESS;
     fprintf(stderr,
             "Congratulations: you built a custom FreeBSD without build-tools. You're on your own!\n");
     return EXIT_FAILURE;
