@@ -4,7 +4,7 @@ osbuild
 [![CI for Linux, Windows, macOS](https://github.com/offscale/osbuild/workflows/CI%20for%20Linux,%20Windows,%20macOS/badge.svg)](https://github.com/offscale/osbuild/actions)
 [![CI for FreeBSD](https://api.cirrus-ci.com/github/offscale/osbuild.svg)](https://cirrus-ci.com/github/offscale/osbuild)
 
-Installs compiler and build tools for your platform. E.g., on Ubuntu it will run equivalent to `apt-get install -y build-essential.`
+Installs compiler and build tools for your platform. E.g., on Ubuntu it will run `apt-get install -y build-essential.`
 
 Supports:
 

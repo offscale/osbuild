@@ -9,7 +9,7 @@
 #include <sys/utsname.h>
 #endif
 
-#include "version.h"
+#include "distribution.h"
 
 
 inline const char* get_distribution(void) {
