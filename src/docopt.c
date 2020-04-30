@@ -15,18 +15,18 @@ const char help_message[] =
 "  osbuild --no-check\n"
 "  osbuild --no-cache\n"
 "  osbuild --no-update\n"
-"  osbuild --distribution\n"
+"  osbuild --distribution=<d>\n"
 "  osbuild --help\n"
 "  osbuild --version\n"
 "\n"
 "Options:\n"
-"  -h --help       Show this screen.\n"
-"  --version       Show version.\n"
-"  --check         Only check if installed, don't install anything.\n"
-"  --no-check      Optimisation argument, set if you know that nothing is installed.\n"
-"  --no-cache      Skip cache. Known to work with `apk` (Alpine Linux).\n"
-"  --no-update     Skip update. E.g., `apk update`, `apt-get update`.\n"
-"  --distribution  Operating System distribution. E.g., 'OpenIndiana', 'alpine', 'macOS'. Will derive when unspecified.\n"
+"  -h --help           Show this screen.\n"
+"  --version           Show version.\n"
+"  --check             Only check if installed, don't install anything.\n"
+"  --no-check          Optimisation argument, set if you know that nothing is installed.\n"
+"  --no-cache          Skip cache. Known to work with `apk` (Alpine Linux).\n"
+"  --no-update         Skip update. E.g., `apk update`, `apt-get update`.\n"
+"  --distribution=<d>  Operating System distribution. E.g., 'OpenIndiana', 'alpine', 'macOS'. Will derive when unspecified.\n"
 "";
 
 const char usage_pattern[] =
@@ -35,7 +35,7 @@ const char usage_pattern[] =
 "  osbuild --no-check\n"
 "  osbuild --no-cache\n"
 "  osbuild --no-update\n"
-"  osbuild --distribution\n"
+"  osbuild --distribution=<d>\n"
 "  osbuild --help\n"
 "  osbuild --version";
 
@@ -218,8 +218,6 @@ size_t elems_to_args(struct Elements *elements, struct DocoptArgs *args, const b
             return 1;
         } else if (!strcmp(option->olong, "--check")) {
             args->check = option->value;
-        } else if (!strcmp(option->olong, "--distribution")) {
-            args->distribution = option->value;
         } else if (!strcmp(option->olong, "--help")) {
             args->help = option->value;
         } else if (!strcmp(option->olong, "--no-cache")) {
@@ -230,6 +228,9 @@ size_t elems_to_args(struct Elements *elements, struct DocoptArgs *args, const b
             args->no_update = option->value;
         } else if (!strcmp(option->olong, "--version")) {
             args->version = option->value;
+        } else if (!strcmp(option->olong, "--distribution")) {
+            if (option->argument)
+                args->distribution = option->argument;
         }
     }
     /* commands */
@@ -250,7 +251,7 @@ size_t elems_to_args(struct Elements *elements, struct DocoptArgs *args, const b
 
 struct DocoptArgs docopt(size_t argc, char *argv[], const bool help, const char *version) {
     struct DocoptArgs args = {
-        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, NULL,
         usage_pattern, help_message
     };
     struct Tokens ts;
@@ -260,12 +261,12 @@ struct DocoptArgs docopt(size_t argc, char *argv[], const bool help, const char 
     };
     struct Option options[] = {
         {NULL, "--check", 0, 0, NULL},
-        {NULL, "--distribution", 0, 0, NULL},
         {"-h", "--help", 0, 0, NULL},
         {NULL, "--no-cache", 0, 0, NULL},
         {NULL, "--no-check", 0, 0, NULL},
         {NULL, "--no-update", 0, 0, NULL},
-        {NULL, "--version", 0, 0, NULL}
+        {NULL, "--version", 0, 0, NULL},
+        {NULL, "--distribution", 1, 0, NULL}
     };
     struct Elements elements = {0, 0, 7, commands, arguments, options};
 

@@ -23,14 +23,14 @@ int main(int argc, char *argv[])
     if (check != NULL && args.check == 0) args.check = (bool)check;
 
     printf("Commands\n");
-    printf("    args.no_cache == %s\n", args.no_cache ? "true" : "false");
-    printf("    args.no_check == %s\n", args.no_check ? "true" : "false");
-    printf("    args.no_update == %s\n", args.no_update ? "true" : "false");
-    printf("    args.check == %s\n", args.check ? "true" : "false");
-    printf("    args.distribution == %s\n", (const char*)args.distribution);
+    printf("    args.no_cache:\t\t%s\n", args.no_cache ? "true" : "false");
+    printf("    args.no_check:\t\t%s\n", args.no_check ? "true" : "false");
+    printf("    args.no_update:\t\t%s\n", args.no_update ? "true" : "false");
+    printf("    args.check:\t\t\t%s\n", args.check ? "true" : "false");
+    printf("    args.distribution:\t%s\n", args.distribution);
 
-    const char *distribution = "macOS" /* get_distribution() */;
+    const char *distribution = get_distribution();
     printf("Running on %s\n", distribution);
-    return osbuild_is_installed(args.distribution == 0 ? (const char*)args.distribution: distribution) ?
+    return osbuild_is_installed(args.distribution == 0 ? args.distribution: distribution) ?
            EXIT_SUCCESS : osbuild_install_build_dependencies(args);
 }

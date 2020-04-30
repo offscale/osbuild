@@ -9,7 +9,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 #configure_file(src/version.h.in src/version.h)
 
-set(src src/main.c src/docopt.c)
+set(src src/main.c src/docopt src/distribution)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     list(APPEND src src/win_build_deps)

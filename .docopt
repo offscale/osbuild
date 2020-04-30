@@ -6,15 +6,15 @@ Usage:
   osbuild --no-check
   osbuild --no-cache
   osbuild --no-update
-  osbuild --distribution
+  osbuild --distribution=<d>
   osbuild --help
   osbuild --version
 
 Options:
-  -h --help       Show this screen.
-  --version       Show version.
-  --check         Only check if installed, don't install anything.
-  --no-check      Optimisation argument, set if you know that nothing is installed.
-  --no-cache      Skip cache. Known to work with `apk` (Alpine Linux).
-  --no-update     Skip update. E.g., `apk update`, `apt-get update`.
-  --distribution  Operating System distribution. E.g., 'OpenIndiana', 'alpine', 'macOS'. Will derive when unspecified.
+  -h --help           Show this screen.
+  --version           Show version.
+  --check             Only check if installed, don't install anything.
+  --no-check          Optimisation argument, set if you know that nothing is installed.
+  --no-cache          Skip cache. Known to work with `apk` (Alpine Linux).
+  --no-update         Skip update. E.g., `apk update`, `apt-get update`.
+  --distribution=<d>  Operating System distribution. E.g., 'OpenIndiana', 'alpine', 'macOS'. Will derive when unspecified.
