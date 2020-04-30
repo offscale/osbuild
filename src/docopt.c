@@ -255,9 +255,9 @@ struct DocoptArgs docopt(size_t argc, char *argv[], const bool help, const char 
         usage_pattern, help_message
     };
     struct Tokens ts;
-    struct Command commands[] = {
+    struct Command commands[] = {NULL
     };
-    struct Argument arguments[] = {
+    struct Argument arguments[] = {NULL
     };
     struct Option options[] = {
         {NULL, "--check", 0, 0, NULL},

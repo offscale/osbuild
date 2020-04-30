@@ -7,7 +7,7 @@ set(HOMEPAGE_URL "https://github.com/offscale/osbuild")
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-#configure_file(src/version.h.in src/version.h)
+# configure_file(src/version.h.in src/version.h)
 
 set(src src/main.c src/docopt src/distribution)
 
