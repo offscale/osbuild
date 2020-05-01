@@ -13,6 +13,9 @@
 
 int main(int argc, char *argv[])
 {
+    const char *distribution = get_distribution();
+    printf("Running on %s\n", distribution);
+
     struct DocoptArgs args = docopt(argc, argv, /* help */ 1, /* version */ VERSION);
     /* TODO: Ensure environment variables don't take priority over CLI arguments */
     const char *no_cache = getenv("NO_CACHE");
@@ -29,8 +32,6 @@ int main(int argc, char *argv[])
     printf("    args.check:\t\t\t%s\n", args.check ? "true" : "false");
     printf("    args.distribution:\t%s\n", args.distribution);
 
-    const char *distribution = get_distribution();
-    printf("Running on %s\n", distribution);
     return osbuild_is_installed(args.distribution == 0 ? args.distribution: distribution) ?
-           EXIT_SUCCESS : osbuild_install_build_dependencies(args);
+           EXIT_SUCCESS : (args.check ? EXIT_FAILURE : osbuild_install_build_dependencies(args));
 }

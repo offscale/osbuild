@@ -9,7 +9,8 @@ Installs compiler and build tools for your platform. E.g., on Ubuntu it will run
 Supports:
 
   - [ ] Linux
-    - [x] Debian (and distros based upon, e.g., Ubuntu)
+    - [x] Debian and derived distros, e.g., Ubuntu
+    - [x] Red Hat Enterprise Linux (RHEL) and derived distros, e.g., CentOS
   - [x] macOS
   - [x] Windows
   - [ ] Solaris/OpenSolaris/illumos
