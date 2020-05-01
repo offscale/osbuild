@@ -1,0 +1,13 @@
+FROM fedora
+
+COPY . /osbuild
+
+WORKDIR /osbuild
+
+RUN dnf install -y cmake make gcc glibc-devel && \
+    mkdir 'cmake-build-docker-debug' && \
+    cd '/osbuild/cmake-build-docker-debug' && \
+    cmake -DCMAKE_BUILD_TYPE='Debug' .. && \
+    cmake --build "$PWD" && chmod +x ./osbuild
+
+CMD /osbuild/cmake-build-docker-debug/osbuild

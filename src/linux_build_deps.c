@@ -16,20 +16,25 @@
 
 #define APT_GET "/usr/bin/apt-get"
 #define ALPINE_APK "/sbin/apk"
+#define DNF "/usr/bin/dnf"
 #define YUM "/usr/bin/yum"
 
 #if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64)
-#define LIBC "/usr/lib/x86_64-linux-gnu/libc.a"
+#define LIBC0 "/usr/lib/x86_64-linux-gnu/libc.a"
+#define LIBC1 "/usr/lib64/libc.so"
 #elif defined(i386) || defined(__i386) || defined(__i386__)
-#define LIBC "/usr/lib/i386-linux-gnu/libc.a"
+#define LIBC0 "/usr/lib/i386-linux-gnu/libc.a"
+#define LIBC1 "/usr/lib/i386/libc.so"
 #else
-#define LIBC "/usr/lib/libc.a"
+#define LIBC0 "/usr/lib/libc.a"
+#define LIBC1 "/usr/lib/libc.so"
 #endif
 
 inline bool osbuild_is_installed(const char* distribution) {
     return (access("/usr/bin/gcc", F_OK) == 0 || access("/usr/bin/clang", F_OK) == 0)
            && access("/usr/bin/ld", F_OK) == 0 && access("/usr/bin/make", F_OK) == 0
-           && (access("/usr/lib/libc.so", F_OK) == 0 || access(LIBC, F_OK) == 0);
+           && (access("/usr/lib/libc.so", F_OK) == 0 || access(LIBC0, F_OK) == 0
+               || access(LIBC1, F_OK) == 0);
 }
 
 inline int alpine_install_build_dependencies(const bool no_update) {
@@ -57,6 +62,17 @@ inline int deb_install_build_dependencies(const bool no_update) {
     return execute_bin(args1);
 }
 
+inline int dnf_install_build_dependencies(const bool no_update) {
+    if (access(DNF, F_OK) != 0) return ENOENT;
+    else if (no_update) {
+        static const char *const args[4] = {DNF, "install", "-Cy", "@development-tools", NULL};
+        const int ret = execute_bin(args);
+        return ret;
+    }
+    static const char *const args[5] = {DNF, "install", "-y", "@development-tools", NULL};
+    return execute_bin(args);
+}
+
 inline int yum_install_build_dependencies(const bool no_update) {
     if (access(YUM, F_OK) != 0) return ENOENT;
     else if (no_update) {
@@ -64,7 +80,7 @@ inline int yum_install_build_dependencies(const bool no_update) {
         const int ret = execute_bin(args);
         return ret;
     }
-    static const char *const args[4] = {YUM, "groupinstall", "Development Tools", NULL};
+    static const char *const args[5] = {YUM, "groupinstall", "-y", "'Development Tools'", NULL};
     return execute_bin(args);
 }
 
@@ -75,7 +91,8 @@ inline int osbuild_install_build_dependencies(const struct DocoptArgs args) {
     printf("access(\"/usr/bin/ld\", F_OK) == 0:\t\t%d\n", access("/usr/bin/ld", F_OK) == 0);
     printf("access(\"/usr/bin/make\", F_OK) == 0:\t\t%d\n", access("/usr/bin/make", F_OK) == 0);
     printf("access(\"/usr/lib/libc.so\", F_OK) == 0:\t%d\n", access("/usr/lib/libc.so", F_OK) == 0);
-    printf("access(\"%s\", F_OK) == 0:\t%d\n", LIBC, access(LIBC, F_OK) == 0);
+    printf("access(\"%s\", F_OK) == 0:\t%d\n", LIBC0, access(LIBC0, F_OK) == 0);
+    printf("access(\"%s\", F_OK) == 0:\t%d\n", LIBC1, access(LIBC1, F_OK) == 0);
 
     if (osbuild_is_installed(args.distribution))
         return EXIT_SUCCESS;
@@ -86,6 +103,8 @@ inline int osbuild_install_build_dependencies(const struct DocoptArgs args) {
         return yum_install_build_dependencies(args.no_update);
     else if (strcmp(args.distribution, "debian") == 0)
         return deb_install_build_dependencies(args.no_update);
+    else if (strcmp(args.distribution, "fedora") == 0)
+        return dnf_install_build_dependencies(args.no_update);
     else {
         fprintf(stderr, "Unsupported Linux distribution: %s", strlen(args.distribution) > 0 ?
                                                               args.distribution : "<unknown>");

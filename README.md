@@ -11,6 +11,7 @@ Supports:
   - [ ] Linux
     - [x] Debian and derived distros, e.g., Ubuntu
     - [x] Red Hat Enterprise Linux (RHEL) and derived distros, e.g., CentOS
+    - [x] Fedora
   - [x] macOS
   - [x] Windows
   - [ ] Solaris/OpenSolaris/illumos
