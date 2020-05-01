@@ -109,7 +109,7 @@ const char* parse_id_from_os_release(const char* filename) {
 }
 
 const char* dist_from_os_release(void) {
-    const char* filenames[] = {"/usr/lib/os-release", "/etc/os-release"};
+    const char* filenames[2] = {"/usr/lib/os-release", "/etc/os-release"};
     size_t i;
     for(i=0; i<sizeof filenames / sizeof filenames[0]; i++) {
         const char* content = parse_id_from_os_release(filenames[i]);

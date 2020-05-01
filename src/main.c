@@ -31,7 +31,10 @@ int main(int argc, char *argv[])
     printf("    args.no_update:\t\t%s\n", args.no_update ? "true" : "false");
     printf("    args.check:\t\t\t%s\n", args.check ? "true" : "false");
     printf("    args.distribution:\t%s\n", args.distribution);
-
+    if (args.distribution == NULL)
+        args.distribution = (char*)distribution;
+    else
+        printf("Acting as if distribution is %s\n", args.distribution);
     return osbuild_is_installed(args.distribution == 0 ? args.distribution: distribution) ?
-           EXIT_SUCCESS : (args.check ? EXIT_FAILURE : osbuild_install_build_dependencies(args));
+           EXIT_SUCCESS : args.check ? EXIT_FAILURE : osbuild_install_build_dependencies(&args);
 }

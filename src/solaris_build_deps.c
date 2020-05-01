@@ -19,10 +19,10 @@ inline bool osbuild_is_installed(const char* distribution) {
            && access("/usr/lib/libc.so", F_OK) == 0;
 }
 
-inline int osbuild_install_build_dependencies(const struct DocoptArgs args) {
-    if (osbuild_is_installed(args.distribution))
+inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
+    if (osbuild_is_installed(args->distribution))
         return EXIT_SUCCESS;
-    else if (strcmp(args.distribution, "openindiana") == 0) {
+    else if (strcmp(args->distribution, "openindiana") == 0) {
         static const char *const exec_args[4] = {
             PROGRAM, "install", "pkg://openindiana.org/metapackages/build-essential", NULL
         };
