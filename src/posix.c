@@ -39,12 +39,12 @@ int execute_bin(const char *const *const args) {
         return EXIT_SUCCESS;
 }
 
-// Edited from https://svnweb.freebsd.org/base/stable/12/usr.bin/which/which.c
-// ?revision=339434&view=markup&pathrev=339434#l105
+/* Edited from https://svnweb.freebsd.org/base/stable/12/usr.bin/which/which.c
+   ?revision=339434&view=markup&pathrev=339434#l105 */
 bool exists(const char *candidate) {
     struct stat fin;
 
-    // XXX work around access(2) false positives for superuser
+    /* XXX work around access(2) false positives for superuser */
     return access(candidate, X_OK) == 0 && stat(candidate, &fin) == 0 && S_ISREG(fin.st_mode)
            && (getuid() != 0 || (fin.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0);
 }

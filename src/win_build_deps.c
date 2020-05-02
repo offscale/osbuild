@@ -91,23 +91,23 @@ int execute_bin(TCHAR *absolute_bin_path, TCHAR *input) {
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    // Start the child process.
+    /* Start the child process. */
     bool ret = CreateProcess(TEXT(absolute_bin_path),
-        input,          // Command line
-        NULL,           // Process handle not inheritable
-        NULL,           // Thread handle not inheritable
-        FALSE,          // Set handle inheritance to FALSE
-        0,              // No creation flags
-        NULL,           // Use parent's environment block
-        NULL,           // Use parent's starting directory
-        &si,            // Pointer to STARTUPINFO structure
-        &pi             // Pointer to PROCESS_INFORMATION structure
+        input,          /* Command line */
+        NULL,           /* Process handle not inheritable */
+        NULL,           /* Thread handle not inheritable */
+        FALSE,          /* Set handle inheritance to FALSE */
+        0,              /* No creation flags */
+        NULL,           /* Use parent's environment block */
+        NULL,           /* Use parent's starting directory */
+        &si,            /* Pointer to STARTUPINFO structure */
+        &pi             /* Pointer to PROCESS_INFORMATION structure */
     );
 
-    // Wait until child process exits.
+    /* Wait until child process exits. */
     WaitForSingleObject( pi.hProcess, INFINITE );
 
-    // Close process and thread handles.
+    /* Close process and thread handles. */
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 

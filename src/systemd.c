@@ -103,7 +103,7 @@ const char* parse_id_from_os_release(const char* filename) {
 
     fclose(fp);
 
-    // printf("candidate: \"%s\";\nid: \"%s\"\n\n", candidate, id);
+    /* printf("candidate: \"%s\";\nid: \"%s\"\n\n", candidate, id); */
 
     return correct_line ? (strlen(candidate) == 0 ? id : candidate) : NULL /*"Unable to parse out distribution name"*/;
 }

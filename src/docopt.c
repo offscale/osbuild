@@ -100,13 +100,15 @@ struct Tokens* tokens_move(struct Tokens *ts) {
  */
 
 size_t parse_doubledash(struct Tokens *ts, struct Elements *elements) {
-    //size_t n_commands = elements->n_commands;
-    //size_t n_arguments = elements->n_arguments;
-    //Command *commands = elements->commands;
-    //Argument *arguments = elements->arguments;
+    /*
+    size_t n_commands = elements->n_commands;
+    size_t n_arguments = elements->n_arguments;
+    Command *commands = elements->commands;
+    Argument *arguments = elements->arguments;
 
-    // not implemented yet
-    // return parsed + [Argument(None, v) for v in tokens]
+    not implemented yet
+    return parsed + [Argument(None, v) for v in tokens]
+    */
     return 0;
 }
 
@@ -125,7 +127,7 @@ size_t parse_long(struct Tokens *ts, struct Elements *elements) {
             break;
     }
     if (i == n_options) {
-        // TODO '%s is not a unique prefix
+        /* TODO '%s is not a unique prefix */
         fprintf(stderr, "%s is not recognized\n", ts->current);
         return 1;
     }
@@ -167,7 +169,7 @@ size_t parse_shorts(struct Tokens *ts, struct Elements *elements) {
                 break;
         }
         if (i == n_options) {
-            // TODO -%s is specified ambiguously %d times
+            /* TODO -%s is specified ambiguously %d times */
             fprintf(stderr, "-%c is not recognized\n", raw[0]);
             return 1;
         }
@@ -193,10 +195,10 @@ size_t parse_shorts(struct Tokens *ts, struct Elements *elements) {
 size_t parse_argcmd(struct Tokens *ts, struct Elements *elements) {
     size_t i;
     size_t n_commands = elements->n_commands;
-    //size_t n_arguments = elements->n_arguments;
+    /* size_t n_arguments = elements->n_arguments; */
     struct Command *command;
     struct Command *commands = elements->commands;
-    //Argument *arguments = elements->arguments;
+    /* Argument *arguments = elements->arguments; */
 
     for (i=0; i < n_commands; i++) {
         command = &commands[i];
@@ -206,8 +208,8 @@ size_t parse_argcmd(struct Tokens *ts, struct Elements *elements) {
             return 0;
         }
     }
-    // not implemented yet, just skip for now
-    // parsed.append(Argument(None, tokens.move()))
+    /* not implemented yet, just skip for now
+       parsed.append(Argument(None, tokens.move())) */
     /*fprintf(stderr, "! argument '%s' has been ignored\n", ts->current);
     fprintf(stderr, "  '");
     for (i=0; i<ts->argc ; i++)
@@ -242,7 +244,7 @@ size_t elems_to_args(struct Elements *elements, struct DocoptArgs *args, const b
     struct Option *option;
     size_t i;
 
-    // fix gcc-related compiler warnings (unused)
+    /* fix gcc-related compiler warnings (unused) */
     (void)command;
     (void)argument;
 

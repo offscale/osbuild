@@ -32,5 +32,14 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "SunOS")
     list(APPEND src src/solaris_build_deps.c)
 endif()
 
+if (MSVC)
+    # TODO
+else()
+    add_compile_options(
+            "$<$<CONFIG:DEBUG>:-Wall -pedantic -Werror>"
+            "$<$<CONFIG:RELEASE>:-O3>"
+    )
+endif()
+
 add_executable(osbuild ${src})
 target_include_directories(osbuild PUBLIC ${PROJECT_BINARY_DIR}/src)

@@ -16,7 +16,7 @@ inline bool osbuild_is_installed(const char *distribution) {
 }
 
 inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
-    // Maybe rewrite https://github.com/Homebrew/install/blob/master/install.sh in C?
+    /* Maybe rewrite https://github.com/Homebrew/install/blob/master/install.sh in C? */
 
     /* if (!args->no_check && osbuild_is_installed(args->distribution)) return EXIT_SUCCESS; */
     static const char *const cli_args[3] = {"/usr/bin/xcode-select", "--install", NULL};
