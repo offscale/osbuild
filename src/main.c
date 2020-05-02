@@ -6,10 +6,7 @@
 #include "docopt.h"
 #include "distribution.h"
 
-/*
 #include "version.h"
-*/
-#define VERSION "0.0.1"
 
 int main(int argc, char *argv[]) {
     const char *distribution = get_distribution();
