@@ -20,9 +20,8 @@ inline bool osbuild_is_installed(const char* distribution) {
 }
 
 inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
-    if (osbuild_is_installed(args->distribution))
-        return EXIT_SUCCESS;
-    else if (strcmp(args->distribution, "openindiana") == 0) {
+    /* if (!args->no_check && osbuild_is_installed(args->distribution)) return EXIT_SUCCESS;
+    else */ if (strcmp(args->distribution, "openindiana") == 0) {
         static const char *const cli_args[4] = {
             PROGRAM, "install", "pkg://openindiana.org/metapackages/build-essential", NULL
         };

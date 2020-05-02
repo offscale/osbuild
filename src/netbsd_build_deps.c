@@ -13,15 +13,17 @@
 
 #include "build_deps.h"
 #include "bsd.h"
+#include "errors.h
 
 inline bool osbuild_is_installed(const char *distribution) {
     return access("/usr/sbin/pkg_info", F_OK) && osbuild_for_bsd_is_installed();
 }
 
 inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
-    return osbuild_is_installed(args->distribution);
-    // TODO: If false, download http://<mirror>/pub/NetBSD/NetBSD-<VERSION>/<ARCH>/binary/sets/comp.tgz
-    //       && tar --unlink -zxvpf .../comp.tgz
+    /* if (!args->no_check && osbuild_is_installed(args->distribution)) return EXIT_SUCCESS; */
+    /* TODO: If false, download http://<mirror>/pub/NetBSD/NetBSD-<VERSION>/<ARCH>/binary/sets/comp.tgz
+             && tar --unlink -zxvpf .../comp.tgz */
+    return UNIMPLEMENTED;
 }
 
 #endif

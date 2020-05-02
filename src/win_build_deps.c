@@ -66,9 +66,8 @@ inline bool osbuild_is_installed(const char* distribution) {
 inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
     /* Maybe rewrite https://chocolatey.org/install.ps1 in C? */
 
-    if (osbuild_is_installed(args->distribution))
-        return EXIT_SUCCESS;
-    else if (_access(PROGRAM, 0) == 0)
+    /* if (osbuild_is_installed(args->distribution)) return EXIT_SUCCESS; */
+    if (_access(PROGRAM, 0) == 0)
         return execute_bin(PROGRAM, " install visualstudio2019buildtools");
     else {
         fprintf(stderr, "Build Tools for Visual Studio 2019 are available "

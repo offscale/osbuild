@@ -15,6 +15,7 @@
 #include "posix.h"
 #include "build_deps.h"
 #include "bsd.h"
+#include "errors.h"
 
 #define PROGRAM "/usr/local/sbin/pkg"
 
@@ -23,10 +24,10 @@ inline bool osbuild_is_installed(const char *distribution) {
 }
 
 inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
-    if (osbuild_is_installed(args->distribution)) return EXIT_SUCCESS;
+    /* if (!args->no_check && osbuild_is_installed(args->distribution)) return EXIT_SUCCESS; */
     fprintf(stderr,
             "Congratulations: you built a custom FreeBSD without build-tools. You're on your own!\n");
-    return EXIT_FAILURE;
+    return UNIMPLEMENTED;
 }
 
 #endif

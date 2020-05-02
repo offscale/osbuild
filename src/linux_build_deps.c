@@ -93,9 +93,10 @@ inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
     printf("access(\"%s\", F_OK) == 0:\t%d\n", LIBC0, access(LIBC0, F_OK) == 0);
     printf("access(\"%s\", F_OK) == 0:\t%d\n", LIBC1, access(LIBC1, F_OK) == 0);
 
-    /*if (osbuild_is_installed(args->distribution))
+    /*
+    if (!args->no_check && osbuild_is_installed(args->distribution))
         return EXIT_SUCCESS;
-    else*/
+    */
     if (strcmp(args->distribution, "alpine") == 0)
         return alpine_install_build_dependencies(args->no_update);
     else if (strcmp(args->distribution, "centos") == 0 || strcmp(args->distribution, "redhat") == 0
