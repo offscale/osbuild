@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
+#include "stdbool.h"
 #include <unistd.h>
 
 #include "build_deps.h"

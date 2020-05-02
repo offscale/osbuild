@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
+#include "stdbool.h"
 #include <stddef.h>
 #include <string.h>
 
@@ -79,7 +79,7 @@ const char usage_pattern[] =
 "  osbuild --help\n"
 "  osbuild --version";
 
-struct Tokens tokens_new(size_t argc, char **argv) {
+struct Tokens tokens_new(const size_t argc, char **argv) {
     struct Tokens ts = {argc, argv, 0, argv[0]};
     return ts;
 }

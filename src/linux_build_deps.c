@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
+#include "stdbool.h"
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
@@ -51,25 +51,27 @@ inline int alpine_install_build_dependencies(const bool no_update) {
 }
 
 inline int deb_install_build_dependencies(const bool no_update) {
+    static const char *const args0[4] = {APT_GET, "update", "-qq", NULL};
+    static const char *const args1[5] = {APT_GET, "install", "-y", "build-essential", NULL};
+
     if (access(APT_GET, F_OK) != 0) return ENOENT;
     else if (!no_update) {
-        static const char *const args0[4] = {APT_GET, "update", "-qq", NULL};
         const int ret = execute_bin(args0);
         if (ret != 0) return ret;
     }
-    static const char *const args1[5] = {APT_GET, "install", "-y", "build-essential", NULL};
     return execute_bin(args1);
 }
 
 inline int dnf_install_build_dependencies(const bool no_update) {
+    static const char *const args0[5] = {DNF, "install", "-Cy", "@development-tools", NULL};
+    static const char *const args1[5] = {DNF, "install", "-y", "@development-tools", NULL};
+
     if (access(DNF, F_OK) != 0) return ENOENT;
     else if (no_update) {
-        static const char *const args[5] = {DNF, "install", "-Cy", "@development-tools", NULL};
-        const int ret = execute_bin(args);
+        const int ret = execute_bin(args0);
         return ret;
     }
-    static const char *const args[5] = {DNF, "install", "-y", "@development-tools", NULL};
-    return execute_bin(args);
+    return execute_bin(args1);
 }
 
 inline int yum_install_build_dependencies(const bool no_update) {

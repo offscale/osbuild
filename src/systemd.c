@@ -1,7 +1,7 @@
 #ifdef __linux__
 
 #include <stdio.h>
-#include <stdbool.h>
+#include "stdbool.h"
 #include <string.h>
 
 #include "systemd.h"
@@ -12,18 +12,18 @@
 const char* parse_id_from_os_release(const char* filename) {
     static char candidate[MAX_DISTRIBUTION_LEN];
     static char id[MAX_DISTRIBUTION_LEN];
-    FILE *fp = fopen(filename, "r");
-    if (!fp) {
-        perror("File opening failed");
-        return "";
-    }
-
     bool correct_line = false;
     bool id_like = false;
     bool set = false;
     bool end_loop = false;
     int c;
     size_t i, cursor;
+    FILE *fp = fopen(filename, "r");
+    if (!fp) {
+        perror("File opening failed");
+        return "";
+    }
+
     candidate[0] = '\n';
     for (cursor = 0; (c = fgetc(fp)) != EOF;) {
         if (end_loop) break;
@@ -70,7 +70,7 @@ const char* parse_id_from_os_release(const char* filename) {
                 break;
             case 'I':
                 if (!correct_line && candidate[0] == '\n' && (
-                        cursor == 0 || candidate[1] == 'D' && candidate[2] == '_' && cursor == 4))
+                        cursor == 0 || (candidate[1] == 'D' && candidate[2] == '_' && cursor == 4)))
                     set = true;
             case 'D':
                 if (candidate[0] == 'I' && cursor == 1)

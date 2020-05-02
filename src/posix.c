@@ -1,7 +1,7 @@
 #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__)
 
 #include <errno.h>
-#include <stdbool.h>
+#include "stdbool.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>

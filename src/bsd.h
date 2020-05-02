@@ -8,7 +8,7 @@
 #if defined(__FreeBSD__) || defined(__NetBSD__)
 
 #include <stddef.h>
-#include <stdbool.h>
+#include "stdbool.h"
 #include <unistd.h>
 
 inline bool osbuild_for_bsd_is_installed() {

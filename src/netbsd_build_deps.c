@@ -8,7 +8,7 @@
 #ifdef __NetBSD__
 
 #include <stddef.h>
-#include <stdbool.h>
+#include "stdbool.h"
 #include <unistd.h>
 
 #include "build_deps.h"

@@ -3,7 +3,7 @@
 
 #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__)
 
-#include <stdbool.h>
+#include "stdbool.h"
 
 extern bool exists(const char *);
 extern int execute_bin(const char *const *);

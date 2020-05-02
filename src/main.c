@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
+#include "stdbool.h"
 
 #include "build_deps.h"
 #include "docopt.h"
