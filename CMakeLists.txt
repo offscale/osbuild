@@ -36,7 +36,7 @@ if (MSVC)
     # TODO
 else()
     add_compile_options(
-            "$<$<CONFIG:DEBUG>:-Wall -pedantic -Werror>"
+            "$<$<CONFIG:DEBUG>:-Wall -Wpedantic -Werror>"
             "$<$<CONFIG:RELEASE>:-O3>"
     )
 endif()
