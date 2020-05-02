@@ -39,7 +39,8 @@ int execute_bin(const char *const *const args) {
         return EXIT_SUCCESS;
 }
 
-// Edited from https://svnweb.freebsd.org/base/stable/12/usr.bin/which/which.c?revision=339434&view=markup&pathrev=339434#l105
+// Edited from https://svnweb.freebsd.org/base/stable/12/usr.bin/which/which.c
+// ?revision=339434&view=markup&pathrev=339434#l105
 bool exists(const char *candidate) {
     struct stat fin;
 

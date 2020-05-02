@@ -95,7 +95,8 @@ else if (access("/etc/release", F_OK) == 0)
     return "Solaris SPARC";
 else if (access("/etc/sun-release", F_OK) == 0)
     return "Sun JDS";
-else if (access("/etc/SuSE-release", F_OK) == 0 || access("/etc/novell-release", F_OK) == 0 || access("/etc/sles-release", F_OK) == 0)
+else if (access("/etc/SuSE-release", F_OK) == 0 || access("/etc/novell-release", F_OK) == 0
+         || access("/etc/sles-release", F_OK) == 0)
     return "SuSE";
 else if (access("/etc/synoinfo.conf", F_OK) == 0)
     return "Synology";

@@ -25,15 +25,22 @@ inline bool osbuild_is_installed(const char* distribution) {
 }
 
 inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
-    // Maybe check if chocolately is installed, and if it is, run `choco install visualstudio2019buildtools` in PS
-    // Maybe rewrite https://chocolatey.org/install.ps1 in C?
+    /* Maybe rewrite https://chocolatey.org/install.ps1 in C? */
 
     if (osbuild_is_installed(args->distribution))
         return EXIT_SUCCESS;
     else if (exists(PROGRAM))
         return execute_bin(PROGRAM, "install visualstudio2019buildtools");
     else {
-        fprintf(stderr, "Build Tools for Visual Studio 2019 are available https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019\n");
+        fprintf(stderr, "Build Tools for Visual Studio 2019 are available "
+                        "https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019\n");
+        /*
+        static const char* url = "https://download.visualstudio.microsoft.com/download/pr/"
+                                 "5e397ebe-38b2-4e18-a187-ac313d07332a/"
+                                 "00945fbb0a29f63183b70370043e249218249f83dbc82cd3b46c5646503f9e27/"
+                                 "vs_BuildTools.exe";
+        static const char* sha256 = "00945fbb0a29f63183b70370043e249218249f83dbc82cd3b46c5646503f9e27";
+        */
         return EXIT_FAILURE;
     }
 }

@@ -105,7 +105,7 @@ const char* parse_id_from_os_release(const char* filename) {
 
     // printf("candidate: \"%s\";\nid: \"%s\"\n\n", candidate, id);
 
-    return correct_line ? (strlen(candidate) == 0? id : candidate) : "" /*"Unable to parse out distribution name"*/;
+    return correct_line ? (strlen(candidate) == 0 ? id : candidate) : NULL /*"Unable to parse out distribution name"*/;
 }
 
 const char* dist_from_os_release(void) {
@@ -113,10 +113,10 @@ const char* dist_from_os_release(void) {
     size_t i;
     for(i=0; i<sizeof filenames / sizeof filenames[0]; i++) {
         const char* content = parse_id_from_os_release(filenames[i]);
-        if (strlen(content) != 0)
+        if (content != NULL)
             return content;
     }
-    return "";
+    return NULL;
 }
 
 #endif
