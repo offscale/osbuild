@@ -10,17 +10,19 @@
 
 int main(int argc, char *argv[]) {
     const char *distribution = get_distribution();
+    const char *no_cache = getenv("NO_CACHE");
+    const char *no_update = getenv("NO_UPDATE");
+    const char *no_check = getenv("NO_CHECK");
+    const char *check = getenv("CHECK");
+    struct DocoptArgs args = docopt(argc, argv, /* help */ 1, /* version */ VERSION);
+
     printf("Running on %s\n", distribution);
 
-    struct DocoptArgs args = docopt(argc, argv, /* help */ 1, /* version */ VERSION);
     /* TODO: Ensure environment variables don't take priority over CLI arguments */
-    const char *no_cache = getenv("NO_CACHE");
+
     if (no_cache != NULL && args.no_cache == 0) args.no_cache = (bool)no_cache;
-    const char *no_update = getenv("NO_UPDATE");
     if (no_update != NULL && args.no_update == 0) args.no_update = (bool)no_update;
-    const char *no_check = getenv("NO_CHECK");
     if (no_check != NULL && args.no_check == 0) args.check = (bool)no_check;
-    const char *check = getenv("CHECK");
     if (check != NULL && args.check == 0) args.check = (bool)check;
 
     /*printf("Commands\n");

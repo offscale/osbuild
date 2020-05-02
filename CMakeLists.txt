@@ -34,11 +34,10 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCC)
     add_compile_options("$<$<CONFIG:DEBUG>:-Wall>" "$<$<CONFIG:RELEASE>:-O3>")
-    add_compile_options("$<$<CONFIG:DEBUG>:-pedantic>")
     add_compile_options("$<$<CONFIG:DEBUG>:-Werror>")
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        # TODO
+        add_compile_options("$<$<CONFIG:DEBUG>:-pedantic>")
     else()
         add_compile_options("$<$<CONFIG:DEBUG>:-Wpedantic>")
     endif()

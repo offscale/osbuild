@@ -3,4 +3,4 @@
 
 extern inline const char* get_distribution(void);
 
-#endif //OSBUILD_DISTRIBUTION_H
+#endif
