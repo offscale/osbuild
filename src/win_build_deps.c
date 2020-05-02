@@ -6,22 +6,61 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
+#include <io.h>
 #include <Windows.h>
-#include <tchar.h>
-#include <windef.h>
-#include <process.h>
 
 #include "build_deps.h"
 #include "errors.h"
 
 int execute_bin(TCHAR *, TCHAR *);
-bool exists(TCHAR *);
 
 #define PROGRAM "C:\\ProgramData\\chocolatey\\bin\\choco.exe"
 
+const LPCSTR find_cl() {
+    /* Originally from https://gitlab.kitware.com/cmake/cmake/-/blob/417b765f/Modules/GetPrerequisites.cmake#L670 */
+    static const LPCSTR cl_paths[12] = {
+        "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\bin",
+        "C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\VC\\bin",
+        "C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\VC\\bin",
+        "C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\bin",
+        "C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\bin",
+        "C:\\Program Files (x86)\\Microsoft Visual Studio 9.0\\VC\\bin",
+        "C:\\Program Files\\Microsoft Visual Studio 8\\VC\\BIN",
+        "C:\\Program Files (x86)\\Microsoft Visual Studio 8\\VC\\BIN",
+        "C:\\Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\BIN",
+        "C:\\Program Files (x86)\\Microsoft Visual Studio .NET 2003\\VC7\\BIN",
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\bin\\Hostx86\\x64",
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\bin\\Hostx86\\x86",
+    };
+
+    size_t i;
+    for (i = 0; i < sizeof cl_paths / sizeof cl_paths[0]; i++)
+        if (_access(cl_paths[i], 0) == 0)
+            return cl_paths[i];
+    return NULL;
+}
+
 inline bool osbuild_is_installed(const char* distribution) {
-    return exists("cl") && exists("nmake");
+    const LPCSTR const cl_location = find_cl();
+    printf("cl at %s\n", cl_location);
+    if (cl_location == NULL) return false;
+
+    LPCSTR joined[150];
+    const size_t len = strlen(cl_location);
+    static const LPCSTR executables[3] = {
+        "\\cl.exe",
+        "\\link.exe",
+        "\\nmake.exe"
+    };
+    size_t i;
+    for (i = 0; i < sizeof executables / sizeof executables[0]; i++) {
+        strncpy(joined, cl_location, len + 1);
+        strncat(joined, executables[i], 10);
+        if (_access(joined, 0) != 0) return false;
+    }
+    return true;
 }
 
 inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
@@ -29,8 +68,8 @@ inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
 
     if (osbuild_is_installed(args->distribution))
         return EXIT_SUCCESS;
-    else if (exists(PROGRAM))
-        return execute_bin(PROGRAM, "install visualstudio2019buildtools");
+    else if (_access(PROGRAM, 0) == 0)
+        return execute_bin(PROGRAM, " install visualstudio2019buildtools");
     else {
         fprintf(stderr, "Build Tools for Visual Studio 2019 are available "
                         "https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019\n");
@@ -78,11 +117,6 @@ int execute_bin(TCHAR *absolute_bin_path, TCHAR *input) {
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
-}
-
-bool exists(TCHAR *absolute_bin_path) {
-    // TODO: Check if path is accessible and executable
-    return true;
 }
 
 #endif
