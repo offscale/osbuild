@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(osbuild
         VERSION "0.0.6"
-        DESCRIPTION "Installs compiler and build tools for your platform"
         LANGUAGES C)
 set(HOMEPAGE_URL "https://github.com/offscale/osbuild")
+set(DESCRIPTION "Installs compiler and build tools for your platform")
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 

@@ -37,17 +37,14 @@ inline bool osbuild_is_installed(const char* distribution) {
 }
 
 inline int alpine_install_build_dependencies(const bool no_update) {
-    if (access(ALPINE_APK, F_OK) != 0) return ENOENT;
-    else if (!no_update) {
-        static const char *const args[3] = {ALPINE_APK, "update", NULL};
-        return execute_bin(args);
-    } else if (getenv("NO_CACHE") != NULL) {
-        static const char *const args[5] = {ALPINE_APK, "--no-cache", "add", "build-base", NULL};
-        return execute_bin(args);
-    }
+    static const char *const args0[3] = {ALPINE_APK, "update", NULL};
+    static const char *const args1[5] = {ALPINE_APK, "--no-cache", "add", "build-base", NULL};
+    static const char *const args2[4] = {ALPINE_APK, "add", "build-base", NULL};
 
-    static const char *const args[4] = {ALPINE_APK, "add", "build-base", NULL};
-    return execute_bin(args);
+    if (access(ALPINE_APK, F_OK) != 0) return ENOENT;
+    else if (!no_update) return execute_bin(args0);
+    else if (getenv("NO_CACHE") != NULL) return execute_bin(args1);
+    else return execute_bin(args2);
 }
 
 inline int deb_install_build_dependencies(const bool no_update) {
@@ -75,18 +72,16 @@ inline int dnf_install_build_dependencies(const bool no_update) {
 }
 
 inline int yum_install_build_dependencies(const bool no_update) {
+    static const char *const args0[5] = {YUM, "groupinstall", "-C", "Development Tools", NULL};
+    static const char *const args1[5] = {YUM, "groupinstall", "-y", "'Development Tools'", NULL};
+
     if (access(YUM, F_OK) != 0) return ENOENT;
-    else if (no_update) {
-        static const char *const args[5] = {YUM, "groupinstall", "-C", "Development Tools", NULL};
-        const int ret = execute_bin(args);
-        return ret;
-    }
-    static const char *const args[5] = {YUM, "groupinstall", "-y", "'Development Tools'", NULL};
-    return execute_bin(args);
+    else if (no_update) return execute_bin(args0);
+    else return execute_bin(args1);
 }
 
 inline int osbuild_install_build_dependencies(const struct DocoptArgs *args) {
-    printf("osbuild_is_installed:\t\t\t\t\t%d\n", osbuild_is_installed(args->distribution));
+    printf("osbuild_is_installed:\t\t\t\t\t%ld\n", osbuild_is_installed(args->distribution));
     printf("access(\"/usr/bin/clang\", F_OK) == 0:\t%d\n", access("/usr/bin/clang", F_OK) == 0);
     printf("access(\"/usr/bin/gcc\", F_OK) == 0:\t\t%d\n", access("/usr/bin/gcc", F_OK) == 0);
     printf("access(\"/usr/bin/ld\", F_OK) == 0:\t\t%d\n", access("/usr/bin/ld", F_OK) == 0);

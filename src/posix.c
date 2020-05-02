@@ -16,7 +16,7 @@
 
 int execute_bin(const char *const *const args) {
     int status;
-    extern char **environ;
+    /* extern char **environ; */
     pid_t ret;
     const char *const env[] = {NULL};
     const pid_t pid = fork();

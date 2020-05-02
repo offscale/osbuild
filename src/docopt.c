@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "stdbool.h"
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -79,8 +79,12 @@ const char usage_pattern[] =
 "  osbuild --help\n"
 "  osbuild --version";
 
-struct Tokens tokens_new(const size_t argc, char **argv) {
-    struct Tokens ts = {argc, argv, 0, argv[0]};
+struct Tokens tokens_new(size_t argc, char **argv) {
+    struct Tokens ts;
+    ts.argc = argc;
+    ts.argv = argv;
+    ts.i = 0;
+    ts.current = argv[0];
     return ts;
 }
 
@@ -310,7 +314,13 @@ struct DocoptArgs docopt(size_t argc, char *argv[], const bool help, const char 
         {NULL, "--version", 0, 0, NULL},
         {NULL, "--distribution", 1, 0, NULL}
     };
-    struct Elements elements = {0, 0, 7, commands, arguments, options};
+    struct Elements elements;
+    elements.n_commands = 0;
+    elements.n_arguments = 0;
+    elements.n_options = 7;
+    elements.commands = commands;
+    elements.arguments = arguments;
+    elements.options = options;
 
     ts = tokens_new(argc, argv);
     if (parse_args(&ts, &elements))

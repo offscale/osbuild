@@ -4,7 +4,9 @@
 
 #ifndef __cplusplus
 
-#define bool unsigned short
+#include <stdlib.h>
+
+#define bool size_t
 #define true 1
 #define false (!true)
 
