@@ -32,13 +32,19 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "SunOS")
     list(APPEND src src/solaris_build_deps.c)
 endif()
 
-if (MSVC)
-    # TODO
+if(CMAKE_COMPILER_IS_GNUCC)
+    add_compile_options("$<$<CONFIG:DEBUG>:-Wall>" "$<$<CONFIG:RELEASE>:-O3>")
+    add_compile_options("$<$<CONFIG:DEBUG>:-pedantic>")
+    add_compile_options("$<$<CONFIG:DEBUG>:-Werror>")
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        # TODO
+    else()
+        add_compile_options("$<$<CONFIG:DEBUG>:-Wpedantic>")
+    endif()
 else()
-    add_compile_options(
-            "$<$<CONFIG:DEBUG>:-Wall -Wpedantic -Werror>"
-            "$<$<CONFIG:RELEASE>:-O3>"
-    )
+    # TODO: Configure compiler flags for this one
+    message("TODO: Configure compiler flags for this one")
 endif()
 
 add_executable(osbuild ${src})
