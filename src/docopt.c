@@ -46,29 +46,6 @@ struct Tokens {
     char *current;
 };
 
-const char help_message[] =
-"osbuild: installs compiler and build tools for your platform.\n"
-"E.g., on Ubuntu it will run `apt-get install -y build-essential.`\n"
-"\n"
-"Usage:\n"
-"  osbuild --check\n"
-"  osbuild --no-check\n"
-"  osbuild --no-cache\n"
-"  osbuild --no-update\n"
-"  osbuild --distribution=<d>\n"
-"  osbuild --help\n"
-"  osbuild --version\n"
-"\n"
-"Options:\n"
-"  -h --help           Show this screen.\n"
-"  --version           Show version.\n"
-"  --check             Only check if installed, don't install anything.\n"
-"  --no-check          Optimisation argument, set if you know that nothing is installed.\n"
-"  --no-cache          Skip cache. Known to work with `apk` (Alpine Linux).\n"
-"  --no-update         Skip update. E.g., `apk update`, `apt-get update`.\n"
-"  --distribution=<d>  Operating System distribution. E.g., 'OpenIndiana', 'alpine', 'macOS'. Will derive when unspecified.\n"
-"";
-
 const char usage_pattern[] =
 "Usage:\n"
 "  osbuild --check\n"
@@ -246,7 +223,7 @@ size_t elems_to_args(struct Elements *elements, struct DocoptArgs *args, const b
     struct Command *command;
     struct Argument *argument;
     struct Option *option;
-    size_t i;
+    size_t i, j;
 
     /* fix gcc-related compiler warnings (unused) */
     (void)command;
@@ -256,7 +233,8 @@ size_t elems_to_args(struct Elements *elements, struct DocoptArgs *args, const b
     for (i=0; i < elements->n_options; i++) {
         option = &elements->options[i];
         if (help && option->value && !strcmp(option->olong, "--help")) {
-            printf("%s", args->help_message);
+            for(j=0; j < 21; j++)
+                puts(args->help_message[j]);
             return 1;
         } else if (version && option->value &&
                    !strcmp(option->olong, "--version")) {
@@ -298,7 +276,28 @@ size_t elems_to_args(struct Elements *elements, struct DocoptArgs *args, const b
 struct DocoptArgs docopt(size_t argc, char *argv[], const bool help, const char *version) {
     struct DocoptArgs args = {
         0, 0, 0, 0, 0, 0, NULL,
-        usage_pattern, help_message
+        usage_pattern,
+        { "osbuild: installs compiler and build tools for your platform.",
+          "E.g., on Ubuntu it will run `apt-get install -y build-essential.`",
+          "",
+          "Usage:",
+          "  osbuild --check",
+          "  osbuild --no-check",
+          "  osbuild --no-cache",
+          "  osbuild --no-update",
+          "  osbuild --distribution=<d>",
+          "  osbuild --help",
+          "  osbuild --version",
+          "",
+          "Options:",
+          "  -h --help           Show this screen.",
+          "  --version           Show version.",
+          "  --check             Only check if installed, don't install anything.",
+          "  --no-check          Optimisation argument, set if you know that nothing is installed.",
+          "  --no-cache          Skip cache. Known to work with `apk` (Alpine Linux).",
+          "  --no-update         Skip update. E.g., `apk update`, `apt-get update`.",
+          "  --distribution=<d>  Operating System distribution. E.g., 'OpenIndiana', 'alpine', 'macOS'. Will derive when unspecified.",
+          ""}
     };
     struct Tokens ts;
     struct Command commands[] = {NULL

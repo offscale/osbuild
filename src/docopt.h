@@ -15,7 +15,7 @@ struct DocoptArgs {
     char *distribution;
     /* special */
     const char *usage_pattern;
-    const char *help_message;
+    const char *help_message[21];
 };
 
 struct DocoptArgs docopt(size_t,char *[],bool,const char *);
